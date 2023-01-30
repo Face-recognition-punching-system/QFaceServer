@@ -1,0 +1,6 @@
+#ifndef ADMIN_HTTP_HANDLER_H
+#define ADMIN_HTTP_HANDLER_H
+
+
+
+#endif // !ADMIN_HTTP_HANDLER_H
