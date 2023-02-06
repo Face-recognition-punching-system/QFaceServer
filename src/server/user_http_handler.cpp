@@ -1,6 +1,6 @@
 #include "user_http_handler.h"
 
-void UserLoginRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+void UserSignInRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
 
 }
 

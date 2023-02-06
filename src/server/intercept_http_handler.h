@@ -10,9 +10,4 @@ public:
 	void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
 };
 
-class AuthHttpHandler : public Poco::Net::HTTPRequestHandler {
-public:
-	void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
-};
-
 #endif // !INTERCEPT_HTTP_HANDLER_H

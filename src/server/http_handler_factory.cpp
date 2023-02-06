@@ -4,14 +4,46 @@
 #include "intercept_http_handler.h"
 
 Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
-    const Poco::Net::HTTPServerRequest& request){
-    const std::string method = std::move(request.getMethod().c_str());
-    const std::string uri = std::move(request.getURI().c_str());
-    if (uri == "/user/login" && method == "POST") {
-        return new UserLoginRequestHandler;
-    }else if(uri == "/usr/reco" && method == "POST") {
+    const Poco::Net::HTTPServerRequest& req){
+    const std::string method = req.getMethod().c_str();
+    const std::string uri = req.getURI().c_str();
+    const std::string contentType = req.getContentType();
+    const std::string host = req.getHost();
+    std::cout << host << std::endl;
+    if (uri == "/user/signIn" && method == "POST" && contentType == "application/json") {
+        return new UserSignInRequestHandler;
+    }
+    else if(uri == "/userr/reco" && method == "POST" && contentType == "application/json") {
         return new UserRecoRequestHandler;
-    }else {
+    }
+    else if (uri == "/admin/signIn" && method == "POST" && contentType == "application/json") {
+        return new AdminSignInRequestHandler;
+    }
+    else if (uri == "/admin/updatePassword" && method == "POST" && contentType == "application/json") {
+        return new AdminUpdatePasswordRequestHandler;
+    }
+    else if (uri == "/admin/workerInfo" && method == "GET" && contentType == "application/json"){
+        return new AdminGetWorkerInfoRequestHandler;
+    }
+    else if (uri == "/admin/clock" && method == "GET" && contentType == "application/json") {
+        return new AdminGetClockRequestHandler;
+    }
+    else if (uri == "/admin/notClock" && method == "GET" && contentType == "application/json") {
+        return new AdminGetNotClockRequestHandler;
+    }
+    else if (uri == "/admin/workerClock" && method == "POST" && contentType == "application/json") {
+        return new AdminGetWorkerClockRequestHandler;
+    }
+    else if (uri == "/admin/feedback" && method == "GET" && contentType == "application/json") {
+        return new AdminGetFeedbackRequestHandler;
+    }
+    else if (uri == "/admin/feedbackRes" && method == "GET" && contentType == "application/json"){
+        return new AdminGetFeedbackResRequestHandler;
+    }
+    else if (uri == "/admin/updateFeedback" && method == "POST" && contentType == "application/json") {
+        return new AdminUpdateFeedbackRequestHandler;
+    }
+    else {
         return new InterceptHttpHandler;
     }
 }

@@ -5,7 +5,7 @@
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Net/HTTPServerRequest.h>
 
-class UserLoginRequestHandler : public Poco::Net::HTTPRequestHandler {
+class UserSignInRequestHandler : public Poco::Net::HTTPRequestHandler {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
 };

@@ -5,10 +5,14 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("QFaceServer")
 
-find_package(OpenCV 4 REQUIRED)
-find_package(Poco  REQUIRED COMPONENTS MongoDB Redis Util Net NetSSL JSON)
-find_package(Boost REQUIRED)
+set(CMAKE_CXX_STANDARD 20)
 
+find_package(OpenCV 4 REQUIRED)
+find_package(Poco REQUIRED COMPONENTS Redis Util Net NetSSL JSON)
+find_package(Boost REQUIRED)
+find_path(MYSQL_ROOT_DIR mysql)
+
+include_directories(${MYSQL_ROOT_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -19,23 +23,24 @@ file(GLOB SERVER_FILES "src/server/*")
 add_executable (
 	QFaceServer
 	"src/main.cpp" 
+	${SERVER_FILES}
 	${ARCFACE_FILES}
 	${CONFIG_FILES}
-	${SERVER_FILES}
-)
+)  
 
-target_link_libraries(QFaceServer PRIVATE ${OpenCV_LIBS})
-target_link_libraries(QFaceServer PRIVATE
-	Poco::MongoDB
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	Poco::Redis
-	Poco::Net
-	Poco::NetSSL
+	Poco::Util
+	Poco::Net  
+	Poco::NetSSL 
 	Poco::JSON)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${MYSQL_ROOT_DIR}/../lib/libmysql.lib)
 
 link_directories(${OpenCV_LIBRARY_DIRS})
 
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-else()
+else() 
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")

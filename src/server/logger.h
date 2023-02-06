@@ -1,18 +1,17 @@
 #pragma once
 #include <Poco/Logger.h>
 #include <memory>
-using  Poco::Logger;
 
-class Log {
+class Logger {
 private:
-	static std::shared_ptr<Log> _instance;
-	static void destoryInstance(Log*);
-	Poco::Logger& _log;
-	Log();
-	~Log();
+	static std::shared_ptr<Logger> _instance;
+	static void destoryInstance(Logger*);
+	Poco::Logger* _logger;
+	Logger();
+	~Logger();
 
 public:
-	static std::shared_ptr<Log> getInstance();
+	static std::shared_ptr<Logger> getInstance();
 	void fatal(const std::string&);
 	void critical(const std::string&);
 	void error(const std::string&);

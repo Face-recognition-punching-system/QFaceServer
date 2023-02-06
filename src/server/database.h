@@ -1,34 +1,28 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <Poco/MongoDB/MongoDB.h>
-#include <Poco/MongoDB/Connection.h>
-#include <Poco/MongoDB/Database.h>
-#include <Poco/MongoDB/Cursor.h>
-#include <Poco/MongoDB/Array.h>
-#include "Poco/JSON/Parser.h"
-#include "Poco/JSON/ParseHandler.h"
-#include "Poco/JSON/JSONException.h"
+#include <Poco/JSON/Parser.h>
+#include <mysql.h>
 #include <mutex>
 #include <memory>
 
 class Database {
 private:
 	static Database* _instance;
-	static std::mutex _mutex;
-	bool _state;
-	Poco::MongoDB::Connection _connection;
+	static std::recursive_mutex _mutex;
+	MYSQL _connection;
 	Database();
 	~Database();
+	bool connect();
 
 public:
 	static Database* getInstance();
 	static void destroyInstance();
-	std::string createData();
-	std::string readOneData();
-	std::string readData();
-	std::string updateData();
-	std::string deleteData();
+	std::string create(std::string&);
+	std::string readOne(std::string&, std::initializer_list<std::string>);
+	std::string read(std::string&, std::initializer_list<std::string>);
+	std::string update(std::string&);
+	std::string del(std::string&);
 };
 
 #endif // !DATABASE_H

@@ -1,26 +1,28 @@
 #include "http_server.h"
 #include "http_handler_factory.h"
 #include "database.h"
+#include "redis.h"
 
 HttpApplication::HttpApplication() {
     _httpSvr = nullptr;
-    logger().information("starting up");
+    logger().information("app starting up");
 }
 
 HttpApplication::~HttpApplication() {
     Database::destroyInstance();
-    logger().information("shutting down");
+    Redis::destoryInstance();
+    logger().information("app shutting down");
 }
 
 void HttpApplication::initialize(Poco::Util::Application& self) {
     loadConfiguration();
     Poco::Util::ServerApplication::initialize(self);
-    logger().information("initialize");
+    logger().information("server initialize");
 }
 
 void HttpApplication::uninitialize() {
     Poco::Util::ServerApplication::uninitialize();
-    logger().information("uninitialize");
+    logger().information("server uninitialize");
 }
 
 int HttpApplication::main(const std::vector<std::string>& args){
