@@ -8,21 +8,24 @@
 
 class Database {
 private:
-	static Database* _instance;
-	static std::recursive_mutex _mutex;
-	MYSQL _connection;
+	MYSQL* _connection;
+	clock_t _alivetime;
+
+public:
 	Database();
 	~Database();
 	bool connect();
-
-public:
-	static Database* getInstance();
-	static void destroyInstance();
 	std::string create(std::string&);
 	std::string readOne(std::string&, std::initializer_list<std::string>);
 	std::string read(std::string&, std::initializer_list<std::string>);
 	std::string update(std::string&);
 	std::string del(std::string&);
+	inline clock_t getAliveTime() const {
+		return clock() - _alivetime;
+	}
+	inline void refreshAliveTime() {
+		_alivetime = clock();
+	}
 };
 
 #endif // !DATABASE_H

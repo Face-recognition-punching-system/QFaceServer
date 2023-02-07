@@ -6,69 +6,44 @@
 // 饿汉模式
 // Database* Database::_instance = new Database();
 
-Database* Database::_instance(nullptr);
-
-std::recursive_mutex Database::_mutex;
 
 Database::Database() {
-	mysql_init(&_connection);
-	auto logger = Logger::getInstance();
-	logger->information("database initialize\n");
-	connect();
+	_connection = mysql_init(nullptr);
 }
 
 Database::~Database() {
-	auto logger = Logger::getInstance();
-	logger->information("database uninitialize\n");
-	mysql_close(&_connection);
-	mysql_library_end();
+	if (_connection != nullptr) {
+		mysql_close(_connection);
+	}
 }
 
 bool Database::connect() {
+	MYSQL* p = mysql_real_connect(_connection, host, username, password, database, 3306, nullptr, 0);
+	char value = 1;
+	mysql_options(_connection, MYSQL_OPT_RECONNECT, &value);
+	mysql_query(_connection, "set names gb2312");
 	auto logger = Logger::getInstance();
-	if (mysql_real_connect(&_connection, host, username, password, database, 3306, nullptr, 0) == nullptr) {
+	if (p == nullptr) {
 		logger->information("database connect error");
-		int code = static_cast<int>(mysql_errno(&_connection));
-		std::string message = static_cast<std::string>(mysql_error(&_connection));
+		int code = static_cast<int>(mysql_errno(_connection));
+		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return false;
 	}
 	else {
-		char value = 1;
-		mysql_options(&_connection, MYSQL_OPT_RECONNECT, &value);
-		mysql_query(&_connection, "set names gb2312");
 		logger->information("database connect success\n");
 		return true;
 	}
 }
 
-Database* Database::getInstance() {
-	if (_instance == nullptr) {
-		std::unique_lock<std::recursive_mutex> lock(_mutex);
-		if (_instance == nullptr) {
-			_instance = new(std::nothrow) Database();
-		}
-	}
-
-	return _instance;
-}
-
-void Database::destroyInstance() {
-	if (_instance != nullptr) {
-		delete _instance;
-		_instance = nullptr;
-	}
-}
-
 std::string Database::create(std::string& query) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
-	int status = static_cast<int>(mysql_real_query(&_connection, query.c_str(),
+	int status = static_cast<int>(mysql_real_query(_connection, query.c_str(),
 		static_cast<unsigned int>(query.size())));
 	std::cout << std::format("query = {}\n", query) << std::endl;
 	if (status == 0) {
-		int affect = static_cast<int>(mysql_affected_rows(&_connection));
+		int affect = static_cast<int>(mysql_affected_rows(_connection));
 		if (affect == 0) {
-			return utils::body("error", "please check params are creect");
+			return utils::body("error", "please check params are exist");
 		}else if(affect == -1) {
 			return utils::body("unknown error");
 		}else {
@@ -76,20 +51,19 @@ std::string Database::create(std::string& query) {
 		}
 	}else {
 		auto logger = Logger::getInstance();
-		int code = static_cast<int>(mysql_errno(&_connection));
-		std::string message = static_cast<std::string>(mysql_error(&_connection));
+		int code = static_cast<int>(mysql_errno(_connection));
+		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return utils::body("unknown error");
 	}
 }
 
 std::string Database::readOne(std::string& query, std::initializer_list<std::string> rest) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
-	int status = static_cast<int>(mysql_real_query(&_connection, query.c_str(),
+	int status = static_cast<int>(mysql_real_query(_connection, query.c_str(),
 		static_cast<unsigned int>(query.size())));
 	std::cout << std::format("query = {}\n", query) << std::endl;
 	if (status == 0) {
-		MYSQL_RES* res = mysql_store_result(&_connection);
+		MYSQL_RES* res = mysql_store_result(_connection);
 		int rows = static_cast<int>(mysql_num_rows(res));
 		int fields = static_cast<int>(mysql_num_fields(res));
 		std::cout << std::format("rows = {} fileds = {}\n", rows, fields) << std::endl;
@@ -114,20 +88,19 @@ std::string Database::readOne(std::string& query, std::initializer_list<std::str
 
 	}else {
 		auto logger = Logger::getInstance();
-		int code = static_cast<int>(mysql_errno(&_connection));
-		std::string message = static_cast<std::string>(mysql_error(&_connection));
+		int code = static_cast<int>(mysql_errno(_connection));
+		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return utils::body("unknown error");
 	}
 }
 
 std::string Database::read(std::string& query, std::initializer_list<std::string> rest) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
-	int status = static_cast<int>(mysql_real_query(&_connection, query.c_str(),
+	int status = static_cast<int>(mysql_real_query(_connection, query.c_str(),
 		static_cast<unsigned int>(query.size())));
 	std::cout << std::format("query = {}\n", query) << std::endl;;
 	if (status == 0) {
-		MYSQL_RES* res = mysql_store_result(&_connection);
+		MYSQL_RES* res = mysql_store_result(_connection);
 		int rows = static_cast<int>(mysql_num_rows(res)), fields = static_cast<int>(mysql_num_fields(res));
 		std::cout << std::format("rows = {} fileds = {}\n", rows, fields) << std::endl;
 		MYSQL_ROW line;
@@ -157,20 +130,19 @@ std::string Database::read(std::string& query, std::initializer_list<std::string
 
 	}else {
 		auto logger = Logger::getInstance();
-		int code = static_cast<int>(mysql_errno(&_connection));
-		std::string message = static_cast<std::string>(mysql_error(&_connection));
+		int code = static_cast<int>(mysql_errno(_connection));
+		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return utils::body("unknown error");
 	}
 }
 
 std::string Database::update(std::string& query) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
-	int status = static_cast<int>(mysql_real_query(&_connection, query.c_str(),
+	int status = static_cast<int>(mysql_real_query(_connection, query.c_str(),
 		static_cast<unsigned int>(query.size())));
 	std::cout << std::format("query = {}\n", query) << std::endl;
 	if (status == 0) {
-		int affect = static_cast<int>(mysql_affected_rows(&_connection));
+		int affect = static_cast<int>(mysql_affected_rows(_connection));
 		if (affect == 0) {
 			return utils::body("error", "nothing need to update");
 		}else if (affect == -1) {
@@ -180,20 +152,19 @@ std::string Database::update(std::string& query) {
 		}
 	}else {
 		auto logger = Logger::getInstance();
-		int code = static_cast<int>(mysql_errno(&_connection));
-		std::string message = static_cast<std::string>(mysql_error(&_connection));
+		int code = static_cast<int>(mysql_errno(_connection));
+		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return utils::body("unknown error");
 	}
 }
 
 std::string Database::del(std::string& query) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
-	int status = static_cast<int>(mysql_real_query(&_connection, query.c_str(),
+	int status = static_cast<int>(mysql_real_query(_connection, query.c_str(),
 		static_cast<unsigned int>(query.size())));
 	std::cout << std::format("query = {}\n", query) << std::endl;
 	if (status == 0) {
-		int affect = static_cast<int>(mysql_affected_rows(&_connection));
+		int affect = static_cast<int>(mysql_affected_rows(_connection));
 		if (affect == 0) {
 			return utils::body("error", "nothing need to delete");
 		}else if (affect == -1) {
@@ -203,8 +174,8 @@ std::string Database::del(std::string& query) {
 		}
 	}else {
 		auto logger = Logger::getInstance();
-		int code = static_cast<int>(mysql_errno(&_connection));
-		std::string message = static_cast<std::string>(mysql_error(&_connection));
+		int code = static_cast<int>(mysql_errno(_connection));
+		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return utils::body("unknown error");
 	}

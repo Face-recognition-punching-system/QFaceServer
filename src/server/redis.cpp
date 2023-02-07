@@ -19,7 +19,7 @@ bool sendAuth(Poco::Redis::Client* client, const std::string& pwd) {
 
 Redis* Redis::_instance(nullptr);
 
-std::recursive_mutex Redis::_mutex;
+std::mutex Redis::_mutex;
 
 Redis::Redis() {
 	auto logger = Logger::getInstance();
@@ -66,7 +66,7 @@ bool Redis::connect() {
 
 Redis* Redis::getInstance() {
 	if (_instance == nullptr) {
-		std::unique_lock<std::recursive_mutex> lock(_mutex);
+		std::unique_lock<std::mutex> lock(_mutex);
 		if (_instance == nullptr) {
 			_instance = new(std::nothrow) Redis();
 		}
@@ -75,7 +75,7 @@ Redis* Redis::getInstance() {
 	return _instance;
 }
 
-void Redis::destoryInstance() {
+void Redis::destroyInstance() {
 	if (_instance != nullptr) {
 		delete _instance;
 		_instance = nullptr;
@@ -83,11 +83,12 @@ void Redis::destoryInstance() {
 }
 
 bool Redis::createData(std::string&& key, std::string&& value) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	auto logger = Logger::getInstance();
-	Poco::Redis::Command set = Poco::Redis::Command::set(key, value);
+	Poco::Redis::Command execute = Poco::Redis::Command::set(key, value);
 	try {
-		auto ret = _redis->execute<std::string>(set);
+		auto ret = _redis->execute<std::string>(execute);
+		std::cout << ret << std::endl;
 		return ret == "OK";
 	}
 	catch (Poco::Redis::RedisException& error) {
@@ -97,7 +98,7 @@ bool Redis::createData(std::string&& key, std::string&& value) {
 		}
 		else {
 			if (connect()) {
-				auto ret = _redis->execute<std::string>(set);
+				auto ret = _redis->execute<std::string>(execute);
 				return ret == "OK";
 			}
 			else {
@@ -108,7 +109,7 @@ bool Redis::createData(std::string&& key, std::string&& value) {
 }
 
 std::string Redis::readData(std::string& key) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	auto logger = Logger::getInstance();
 	Poco::Redis::Command execute = Poco::Redis::Command::get(key);
 	try {
@@ -133,7 +134,7 @@ std::string Redis::readData(std::string& key) {
 }
 
 bool Redis::delData(std::string&& key) {
-	std::unique_lock<std::recursive_mutex> lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	auto logger = Logger::getInstance();
 	Poco::Redis::Command execute = Poco::Redis::Command::del(key);
 	try {

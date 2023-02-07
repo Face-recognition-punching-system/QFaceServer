@@ -7,7 +7,7 @@
 class Redis {
 private:
 	static Redis* _instance;
-	static std::recursive_mutex _mutex;
+	static std::mutex _mutex;
 	Poco::Redis::Client *_redis;
 	Redis();
 	~Redis();
@@ -15,7 +15,7 @@ private:
 
 public:
 	static Redis* getInstance();
-	static void destoryInstance();
+	static void destroyInstance();
 	bool createData(std::string&&, std::string&&);
 	std::string readData(std::string&);
 	bool delData(std::string&&);

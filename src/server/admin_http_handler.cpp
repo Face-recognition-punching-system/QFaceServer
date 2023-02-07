@@ -1,5 +1,5 @@
 #include "admin_http_handler.h"
-#include "database.h"
+#include "database_pool.h"
 #include "redis.h"
 #include "logger.h"
 #include "utils.h"
@@ -13,13 +13,14 @@ void AdminSignInRequestHandler::handleRequest(
 		Poco::JSON::Parser parser;
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (object->has("adminId") && object->has("password") && object->has("csrfToken") && object->size() == 3) {
-			auto database = Database::getInstance();
+			DatabasePool* dbp = DatabasePool::getInstance();
+			std::shared_ptr<Database> db = dbp->getDatabase();
 			std::string&& adminId = object->get("adminId");
 			std::string&& password = object->get("password");
 			std::string query = std::format(
 				"select id from qface.admin where adminId = \"{}\" and password = \"{}\"",
 				adminId, password);
-			body = database->readOne(query, { "id" });
+			body = db->readOne(query, { "id" });
 			auto ret = parser.parse(body).extract<Poco::JSON::Object::Ptr>();
 			if (ret->has("id")) {
 				auto redis = Redis::getInstance();
@@ -60,12 +61,13 @@ void AdminUpdatePasswordRequestHandler::handleRequest(
 			std::string csrfToken = object->get("csrfToken");
 			auto ret = redis->readData(id);
 			if (ret != "" && ret == csrfToken) {
-				auto database = Database::getInstance();
+				DatabasePool* dbp = DatabasePool::getInstance();
+				std::shared_ptr<Database> db = dbp->getDatabase();
 				std::string password = object->get("password");
 				std::string query = std::format(
 					"update qface.admin set password = \"{}\" where id = \"{}\"",
 					password, id);
-				body = database->update(query);
+				body = db->update(query);
 			}
 			else {
 				body = utils::body("signOut");
@@ -94,9 +96,10 @@ void AdminGetWorkerInfoRequestHandler::handleRequest(
 	try {
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (object->size() == 0) {
-			auto database = Database::getInstance();
+			DatabasePool* dbp = DatabasePool::getInstance();
+			std::shared_ptr<Database> db = dbp->getDatabase();
 			std::string query = "select id, workerId, name, age, department from qface.worker";
-			body = database->read(query,
+			body = db->read(query,
 				{ "id", "workerId", "name", "age", "department" });
 		}
 		else {
@@ -122,9 +125,10 @@ void AdminGetClockRequestHandler::handleRequest(
 	try {
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (object->size() == 0) {
-			auto database = Database::getInstance();
+			DatabasePool* dbp = DatabasePool::getInstance();
+			std::shared_ptr<Database> db = dbp->getDatabase();
 			std::string query = "select workerid, name, create_time from clock left join worker on clock.wid = worker.id where to_days(create_time) = to_days(now())";
-			body = database->read(query,
+			body = db->read(query,
 				{ "workerId", "name", "create_time" });
 		}
 		else {
@@ -150,9 +154,10 @@ void AdminGetNotClockRequestHandler::handleRequest(
 	try {
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (object->size() == 0) {
-			auto database = Database::getInstance();
+			DatabasePool* dbp = DatabasePool::getInstance();
+			std::shared_ptr<Database> db = dbp->getDatabase();
 			std::string query = "select workerId, name from worker where id not in(select wid as id from clock where (to_days(create_time) = to_days(now())))";
-			body = database->read(query,
+			body = db->read(query,
 				{ "workerId", "name" });
 		}
 		else {
@@ -187,11 +192,12 @@ void AdminGetWorkerClockRequestHandler::handleRequest(
 			auto redis = Redis::getInstance();
 			auto ret = redis->readData(id);
 			if (ret != "" && ret == csrfToken) {
+				DatabasePool* dbp = DatabasePool::getInstance();
+				std::shared_ptr<Database> db = dbp->getDatabase();
 				std::string wid = object->get("wid");
-				auto database = Database::getInstance();
 				std::string query = std::format(
 					"SELECT id, create_time, img FROM qface.clock where wid = \"{}\"", wid);
-				body = database->read(query,
+				body = db->read(query,
 					{ "id", "create_time", "img" });
 			}
 			else {
@@ -221,9 +227,10 @@ void AdminGetFeedbackRequestHandler::handleRequest(
 	try {
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (object->size() == 0) {
-			auto database = Database::getInstance();
+			DatabasePool* dbp = DatabasePool::getInstance();
+			std::shared_ptr<Database> db = dbp->getDatabase();
 			std::string query = "SELECT feedback.id as fid, clock.id as cid, workerId, name, reason, feedback.create_time, res from worker RIGHT join clock on worker.id = clock.wid RIGHT JOIN feedback  on clock.id = feedback.cid where res = \"无\"";
-			body = database->read(query,
+			body = db->read(query,
 				{ "fid", "cid", "workerId", "name", "reason", "create_time", "res" });
 		}
 		else {
@@ -257,17 +264,18 @@ void AdminUpdateFeedbackRequestHandler::handleRequest(
 			auto redis = Redis::getInstance();
 			auto ret = redis->readData(id);
 			if (ret != "" && ret == csrfToken) {
+				DatabasePool* dbp = DatabasePool::getInstance();
+				std::shared_ptr<Database> db = dbp->getDatabase();
 				const std::string&& res = utils::U2G(object->get("res"));
 				const std::string&& fid = object->get("fid");
 				const std::string&& cid = object->get("cid");
 				const std::string&& isClock = res == "通过" ? "是" : "否";
-				auto database = Database::getInstance();
 				std::string query = std::format(
 					"update feedback set res = \"{}\" where id = \"{}\"", res, fid);
-				body = database->update(query);
+				body = db->update(query);
 				query = std::format(
 					"update clock set isClock = \"{}\" where id = \"{}\"", isClock, cid);
-				body = database->update(query);
+				body = db->update(query);
 			}
 			else {
 				body = utils::body("signOut");
@@ -296,9 +304,10 @@ void AdminGetFeedbackResRequestHandler::handleRequest(
 	try {
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (object->size() == 0) {
-			auto database = Database::getInstance();
+			DatabasePool* dbp = DatabasePool::getInstance();
+			std::shared_ptr<Database> db = dbp->getDatabase();
 			std::string query = "SELECT workerId, name, reason, feedback.create_time, res from worker RIGHT join clock on worker.id = clock.wid RIGHT JOIN feedback on clock.id = feedback.cid where res != \"无\"";
-			body = database->read(query,
+			body = db->read(query,
 				{ "workerId", "name", "reason", "create_time", "res" });
 		}
 		else {

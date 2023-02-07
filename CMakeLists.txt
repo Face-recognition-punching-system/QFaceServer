@@ -20,6 +20,15 @@ file(GLOB ARCFACE_FILES "src/arcface/*")
 file(GLOB CONFIG_FILES "src/config/*")
 file(GLOB SERVER_FILES "src/server/*")
 
+configure_file("src/model/det1.caffemodel" "model/det1.caffemodel" COPYONLY)
+configure_file("src/model/det1.prototxt" "model/det1.prototxt" COPYONLY)
+configure_file("src/model/det2.caffemodel" "model/det2.caffemodel" COPYONLY)
+configure_file("src/model/det2.prototxt" "model/det2.prototxt" COPYONLY)
+configure_file("src/model/det3.caffemodel" "model/det3.caffemodel" COPYONLY)
+configure_file("src/model/det3.prototxt" "model/det3.prototxt" COPYONLY)
+configure_file("src/model/facenet.pb" "model/facenet.pb" COPYONLY)
+configure_file("src/model/facenet.pbtxt" "model/facenet.pbtxt" COPYONLY)
+
 add_executable (
 	QFaceServer
 	"src/main.cpp" 

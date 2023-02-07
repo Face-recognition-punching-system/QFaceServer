@@ -1,6 +1,6 @@
 #include "http_server.h"
 #include "http_handler_factory.h"
-#include "database.h"
+#include "database_pool.h"
 #include "redis.h"
 
 HttpApplication::HttpApplication() {
@@ -9,8 +9,8 @@ HttpApplication::HttpApplication() {
 }
 
 HttpApplication::~HttpApplication() {
-    Database::destroyInstance();
-    Redis::destoryInstance();
+    DatabasePool::destroyInstance();
+    Redis::destroyInstance();
     logger().information("app shutting down");
 }
 
