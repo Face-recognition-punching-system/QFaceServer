@@ -1,6 +1,6 @@
 #include "admin_http_handler.h"
 #include "database_pool.h"
-#include "redis.h"
+#include "redis_pool.h"
 #include "logger.h"
 #include "utils.h"
 
@@ -23,10 +23,10 @@ void AdminSignInRequestHandler::handleRequest(
 			body = db->readOne(query, { "id" });
 			auto ret = parser.parse(body).extract<Poco::JSON::Object::Ptr>();
 			if (ret->has("id")) {
-				auto redis = Redis::getInstance();
 				std::string id = ret->get("id");
 				std::string csrfToken = object->get("csrfToken");
-				if (!redis->createData(std::move(id), std::move(csrfToken))) {
+				auto rp = RedisPool::getInstance();
+				if (!rp->set(id, csrfToken)) {
 					body = utils::body("unknown error");
 				}
 			}
@@ -56,11 +56,12 @@ void AdminUpdatePasswordRequestHandler::handleRequest(
 		if (!object->has("csrfToken")) {
 			body = utils::body("authentication failure");
 		}else if (object->has("password") && object->has("id") && object->size() == 3) {
-			auto redis = Redis::getInstance();
 			std::string id = object->get("id");
 			std::string csrfToken = object->get("csrfToken");
-			auto ret = redis->readData(id);
-			if (ret != "" && ret == csrfToken) {
+			auto rp = RedisPool::getInstance();
+			std::string res = rp->get(id);
+			if (res!= "" && res == csrfToken) {
+				body = utils::body("unknown error");
 				DatabasePool* dbp = DatabasePool::getInstance();
 				std::shared_ptr<Database> db = dbp->getDatabase();
 				std::string password = object->get("password");
@@ -189,16 +190,16 @@ void AdminGetWorkerClockRequestHandler::handleRequest(
 		else if (object->has("wid") && object->has("id") && object->size() == 3) {
 			std::string csrfToken = object->get("csrfToken");
 			std::string id = object->get("id");
-			auto redis = Redis::getInstance();
-			auto ret = redis->readData(id);
-			if (ret != "" && ret == csrfToken) {
+			auto rp = RedisPool::getInstance();
+			std::string res = rp->get(id);
+			if (res != "" && res == csrfToken) {
 				DatabasePool* dbp = DatabasePool::getInstance();
 				std::shared_ptr<Database> db = dbp->getDatabase();
 				std::string wid = object->get("wid");
 				std::string query = std::format(
-					"SELECT id, create_time, img FROM qface.clock where wid = \"{}\"", wid);
+					"SELECT id, create_time, img, isClock FROM qface.clock where wid = \"{}\"", wid);
 				body = db->read(query,
-					{ "id", "create_time", "img" });
+					{ "id", "create_time", "img", "isClock"});
 			}
 			else {
 				body = utils::body("signOut");
@@ -261,9 +262,9 @@ void AdminUpdateFeedbackRequestHandler::handleRequest(
 		else if (object->has("id") && object->has("fid") && object->has("cid") && object->has("res") && object->size() == 5) {
 			std::string csrfToken = object->get("csrfToken");
 			std::string id = object->get("id");
-			auto redis = Redis::getInstance();
-			auto ret = redis->readData(id);
-			if (ret != "" && ret == csrfToken) {
+			auto rp = RedisPool::getInstance();
+			std::string res = rp->get(id);
+			if (res != "" && res == csrfToken) {
 				DatabasePool* dbp = DatabasePool::getInstance();
 				std::shared_ptr<Database> db = dbp->getDatabase();
 				const std::string&& res = utils::U2G(object->get("res"));
@@ -309,6 +310,127 @@ void AdminGetFeedbackResRequestHandler::handleRequest(
 			std::string query = "SELECT workerId, name, reason, feedback.create_time, res from worker RIGHT join clock on worker.id = clock.wid RIGHT JOIN feedback on clock.id = feedback.cid where res != \"нч\"";
 			body = db->read(query,
 				{ "workerId", "name", "reason", "create_time", "res" });
+		}
+		else {
+			body = utils::body("param invalid");
+		}
+	}
+	catch (const Poco::JSON::JSONException& e) {
+		auto instance = Logger::getInstance();
+		instance->information(e.displayText());
+		instance->information("\n");
+		body = utils::body("json parser error");
+	}
+
+	res.sendBuffer(body.c_str(), body.length());
+}
+
+void AdminGetWorkerImgRequestHandler::handleRequest(
+	Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+	std::string body("");
+	res.setContentType("application/json");
+	std::string data(std::istreambuf_iterator<char>(req.stream()), {});
+	Poco::JSON::Parser parser;
+	try {
+		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
+		if (!object->has("csrfToken")) {
+			body = utils::body("authentication failure");
+		}
+		if (object->has("id") && object->has("wid") && object->size() == 3) {
+			std::string csrfToken = object->get("csrfToken");
+			std::string id = object->get("id");
+			auto rp = RedisPool::getInstance();
+			std::string res = rp->get(id);
+			if (res != "" && res == csrfToken) {
+				std::string wid = object->get("wid");
+				std::string path = std::format("img/{}.jpg", wid);
+				std::cout << path << std::endl;
+				try {
+					if (_access(path.c_str(), 0) == -1) {
+						body = utils::body("unknown error");
+					}
+					else {
+						cv::Mat img = cv::imread(path);
+						if (!img.empty()) {
+							std::string base64 = utils::Mat2Base64(img, "jpg");
+							Poco::JSON::Object o;
+							std::stringstream ostream;
+							o.set("img", base64);
+							o.stringify(ostream);
+							body = ostream.str();
+						}
+						else {
+							body = utils::body("unknown error");
+						}
+					}
+				}
+				catch (cv::Exception& e) {
+					e.formatMessage();
+					body = utils::body("unknown error");
+				}
+			}
+			else {
+				body = utils::body("signOut");
+			}
+			
+		}
+		else {
+			body = utils::body("param invalid");
+		}
+	}
+	catch (const Poco::JSON::JSONException& e) {
+		auto instance = Logger::getInstance();
+		instance->information(e.displayText());
+		instance->information("\n");
+		body = utils::body("json parser error");
+	}
+
+	res.sendBuffer(body.c_str(), body.length());
+}
+
+void AdminUpdateWorkerImgRequestHandler::handleRequest(
+	Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+	std::string body("");
+	res.setContentType("application/json");
+	std::string data(std::istreambuf_iterator<char>(req.stream()), {});
+	Poco::JSON::Parser parser;
+	try {
+		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
+		if (!object->has("csrfToken")) {
+			body = utils::body("authentication failure");
+		}
+		if (object->has("id") && object->has("wid") && object->has("img") && object->size() == 4) {
+			std::string csrfToken = object->get("csrfToken");
+			std::string id = object->get("id");
+			auto rp = RedisPool::getInstance();
+			std::string res = rp->get(id);
+			if (res != "" && res == csrfToken) {
+				std::string wid = object->get("wid");
+				std::string base64 = object->get("img");
+				std::string path = std::format("img/{}.jpg", wid);
+				try {
+					std::string prefix = "img/";
+					if (_access(prefix.c_str(), 0) == -1) {
+						std::unique_lock<std::mutex> lock(_mutex);
+						if (_access(prefix.c_str(), 0) == -1) {
+							_mkdir(prefix.c_str());
+						}
+					}
+
+					cv::Mat img = utils::Base2Mat(base64);
+					std::unique_lock<std::mutex> lock(_mutex);
+					cv::imwrite(path, img);
+					body = utils::body("success");
+				}
+				catch (cv::Exception &e) {
+					e.formatMessage();
+					body = utils::body("unknown error");
+				}
+			}
+			else {
+				body = utils::body("signOut");
+			}
+
 		}
 		else {
 			body = utils::body("param invalid");

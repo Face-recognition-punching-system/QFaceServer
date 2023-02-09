@@ -1,7 +1,7 @@
 #include "http_server.h"
 #include "http_handler_factory.h"
 #include "database_pool.h"
-#include "redis.h"
+#include "../config/config.h"
 
 HttpApplication::HttpApplication() {
     _httpSvr = nullptr;
@@ -10,7 +10,6 @@ HttpApplication::HttpApplication() {
 
 HttpApplication::~HttpApplication() {
     DatabasePool::destroyInstance();
-    Redis::destroyInstance();
     logger().information("app shutting down");
 }
 

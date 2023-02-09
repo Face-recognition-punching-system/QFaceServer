@@ -9,12 +9,16 @@
 
 Database::Database() {
 	_connection = mysql_init(nullptr);
+	auto logger = Logger::getInstance();
+	logger->information("database initialize\n");
 }
 
 Database::~Database() {
 	if (_connection != nullptr) {
 		mysql_close(_connection);
 	}
+	auto logger = Logger::getInstance();
+	logger->information("database uninitialize");
 }
 
 bool Database::connect() {

@@ -43,6 +43,12 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
     else if (uri == "/admin/updateFeedback" && method == "POST" && contentType == "application/json") {
         return new AdminUpdateFeedbackRequestHandler;
     }
+    else if (uri == "/admin/getWorkerImg" && method == "POST" && contentType == "application/json") {
+        return new AdminGetWorkerImgRequestHandler;
+    }
+    else if (uri == "/admin/updateWorkerImg" && method == "POST" && contentType == "application/json") {
+        return new AdminUpdateWorkerImgRequestHandler;
+    }
     else {
         return new InterceptHttpHandler;
     }

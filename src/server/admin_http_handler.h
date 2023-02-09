@@ -3,9 +3,13 @@
 
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPServerResponse.h>
-#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPServerRequest.h> 
 #include <Poco/JSON/Parser.h>
 #include <format>
+#include <hiredis/hiredis.h>
+#include <io.h>
+#include <direct.h>
+#include <mutex>
 
 class AdminSignInRequestHandler : public Poco::Net::HTTPRequestHandler {
 public:
@@ -48,6 +52,22 @@ public:
 };
 
 class AdminGetFeedbackResRequestHandler : public Poco::Net::HTTPRequestHandler {
+public:
+	void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
+};
+
+class AdminGetWorkerImgRequestHandler : public Poco::Net::HTTPRequestHandler {
+private:
+	std::mutex _mutex;
+
+public:
+	void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
+};
+
+class AdminUpdateWorkerImgRequestHandler : public Poco::Net::HTTPRequestHandler {
+private:
+	std::mutex _mutex;
+
 public:
 	void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
 };

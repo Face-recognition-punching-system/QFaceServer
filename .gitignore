@@ -1,4 +1,5 @@
 out
 build
 src/config
+src/zredis
 .vs

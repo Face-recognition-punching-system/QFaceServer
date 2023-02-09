@@ -4,7 +4,7 @@ DatabasePool* DatabasePool::_instance(nullptr);
 
 std::mutex DatabasePool::_mutex;
 
-DatabasePool::DatabasePool():_initSize(10), _maxSize(1024), _maxIdleTime(60), _connectionTimeout(100){
+DatabasePool::DatabasePool():_initSize(2), _maxSize(2), _maxIdleTime(60), _connectionTimeout(100){
 	if (!loadConfigFile()) {
 		return;
 	}
