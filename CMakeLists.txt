@@ -1,7 +1,4 @@
-﻿# CMakeList.txt: QFaceServer 的 CMake 项目，在此处包括源代码并定义
-# 项目特定的逻辑。
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
 project ("QFaceServer")
 
@@ -34,8 +31,8 @@ configure_file("src/model/facenet.pb" "model/facenet.pb" COPYONLY)
 configure_file("src/model/facenet.pbtxt" "model/facenet.pbtxt" COPYONLY)
 
 add_executable (
-	QFaceServer
-	"src/main.cpp" 
+	${PROJECT_NAME}
+	"src/main.cpp"  
 	${SERVER_FILES}
 	${ARCFACE_FILES}
 	${CONFIG_FILES}
