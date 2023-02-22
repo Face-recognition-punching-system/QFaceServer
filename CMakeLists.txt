@@ -29,8 +29,8 @@ configure_file("src/model/det3.caffemodel" "model/det3.caffemodel" COPYONLY)
 configure_file("src/model/det3.prototxt" "model/det3.prototxt" COPYONLY)
 configure_file("src/model/facenet.pb" "model/facenet.pb" COPYONLY)
 configure_file("src/model/facenet.pbtxt" "model/facenet.pbtxt" COPYONLY)
-
-add_executable (
+ 
+add_executable ( 
 	${PROJECT_NAME}
 	"src/main.cpp"  
 	${SERVER_FILES}

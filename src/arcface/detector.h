@@ -14,11 +14,10 @@ private:
     std::unique_ptr<OutputNetwork> _onet;
 
 public:
-    MTCNNDetector(std::string modelpath);
-    std::vector<Face> detect(const cv::Mat& img, const float minFaceSize, const float maxFacescale,
-        const float scaleFactor);
-    void faceAlign(cv::Mat& img, std::vector<Face>& faces, std::string savepath);
-    void datasetAlign(std::string imgdir, std::string savedir);
+    MTCNNDetector();
+    std::vector<Face> detect(const cv::Mat&, const float, const float, const float);
+    std::vector<cv::Mat> faceAlign(cv::Mat&, std::vector<Face>&);
+    std::vector<cv::Mat> datasetAlign(cv::Mat&, std::string);
 };
 
 #endif

@@ -1,22 +1,22 @@
 #include "detector.h"
 
 
-MTCNNDetector::MTCNNDetector(std::string modelpath)
+MTCNNDetector::MTCNNDetector()
 {
     //配置三个网络
     ProposalNetwork::Config pConfig;
-    pConfig.caffeModel = modelpath + "/det1.caffemodel";
-    pConfig.protoText = modelpath + "/det1.prototxt";
+    pConfig.caffeModel = "model/det1.caffemodel";
+    pConfig.protoText = "model/det1.prototxt";
     pConfig.threshold = 0.6f;
 
     RefineNetwork::Config rConfig;
-    rConfig.caffeModel = modelpath + "/det2.caffemodel";
-    rConfig.protoText = modelpath + "/det2.prototxt";
+    rConfig.caffeModel = "model/det2.caffemodel";
+    rConfig.protoText = "model/det2.prototxt";
     rConfig.threshold = 0.7f;
 
     OutputNetwork::Config oConfig;
-    oConfig.caffeModel = modelpath + "/det3.caffemodel";
-    oConfig.protoText = modelpath + "/det3.prototxt";
+    oConfig.caffeModel = "model/det3.caffemodel";
+    oConfig.protoText = "model/det3.prototxt";
     oConfig.threshold = 0.7f;
 
     _pnet = std::unique_ptr<ProposalNetwork>(new ProposalNetwork(pConfig));
@@ -176,36 +176,18 @@ void getAffineMatrix(double* src_5pts, const double* dst_5pts, double* M)
     M[2] = pts0[0] + ptmp[0] - scale * (ptmp[0] * _b + ptmp[1] * _a);
     M[5] = pts0[1] + ptmp[1] - scale * (-ptmp[0] * _a + ptmp[1] * _b);
 }
-/// <summary>
-/// 检测并对齐数据集中的图片
-/// </summary>
-/// <param name="imgdir"></param>
-/// <param name="savedir"></param>
-void MTCNNDetector::datasetAlign(std::string imgdir, std::string savedir)
+
+std::vector<cv::Mat> MTCNNDetector::datasetAlign(cv::Mat& img, std::string imgpath)
 {
-    std::vector<std::string> imgspath;
-    cv::glob(imgdir + "/*.jpg", imgspath);
-    for (int i = 0; i < imgspath.size(); i++)
-    {
-        int ed=0,st=0;
-        for (int j = 0; j < imgspath[i].size(); j++)
-        {
-            if (imgspath[i][j] == '\\')imgspath[i][j] = '/';
-            if (imgspath[i][j] == '.')ed = j;
-            if (imgspath[i][j] == '/')st = j+1;
-        }
-        int len = ed - st;
-        if (len <= 0)continue;
-        cv::Mat img = cv::imread(imgspath[i]);
-        std::vector<Face> faces = detect(img, 20.f, 1.f, 0.709f);
-        faceAlign(img, faces, savedir + "/" + imgspath[i].substr(st, len));
-    }
+	std::vector<Face> faces = detect(img, 20.f, 1.f, 0.709f);
+	return faceAlign(img, faces);
 }
 
 
 //人脸对齐
-void MTCNNDetector::faceAlign(cv::Mat& img, std::vector<Face>& faces, std::string savepath)
+std::vector<cv::Mat> MTCNNDetector::faceAlign(cv::Mat& img, std::vector<Face>& faces)
 {
+    std::vector<cv::Mat> imgs;
     double coord5point1[10] = { 30.2946, 65.5318, 48.0252, 33.5493, 62.7299, 
         51.6963, 51.5014, 71.7366, 92.3655, 92.2041 }; //112x96的目标点
     double coord5point2[10] = { 30.2946 + 8.0000, 65.5318 + 8.0000, 
@@ -259,7 +241,8 @@ void MTCNNDetector::faceAlign(cv::Mat& img, std::vector<Face>& faces, std::strin
         cv::Mat alignFace_112x112 = cv::Mat::zeros(112, 112, img.type());
         //调用仿射变化函数，使用变化矩阵对齐人脸，
         warpAffine(enlargedFace, alignFace_112x112, warp_mat_112x112, alignFace_112x112.size());//裁剪图片
-        cv::imwrite(savepath + "_align" + std::to_string(i) + ".jpg", alignFace_112x112);
+        imgs.push_back(alignFace_112x112);
     }
 
+    return imgs;
 }

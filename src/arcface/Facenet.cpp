@@ -1,39 +1,21 @@
 #include "Facenet.h"
 #include "utils.h"
-Facenet::Facenet(string modelpb, string modeltxt)
+Facenet::Facenet()
 {
-	_net = cv::dnn::readNetFromTensorflow(modelpb);
+	_net = cv::dnn::readNetFromTensorflow("model/facenet.pb");
 	if (_net.empty()) {
 		cout << "facenet加载失败" << endl;
 		throw std::invalid_argument("facenet loading error");
 	}
-	
 }
 
-void Facenet::datasetExtract(string dataset, string aligned)
+void Facenet::datasetExtract()
 {
-	string labelpath = dataset + "/label.txt";
-	//获取标签
-	std::ifstream file;
-	file.open(labelpath, std::ios::in);
-	if (!file.is_open()) {
-		std::cout << "open file failed!" << std::endl;
-	}
-	//读文件
-	std::string str;
-	while (std::getline(file, str)) {
-		int i = str.find("-");
-		if (i == -1)continue;
-		_nametolabel[str.substr(0, i)] = str.substr(i + 1);
-		
-	}
-	file.close();
-
 	//提取对齐的图片特征
 	_feat.clear();
 	_vimgname.clear();
 	vector<string> imgspath;
-	cv::glob(aligned + "/*.jpg", imgspath);
+	cv::glob("img/*.jpg", imgspath);
 	for (int i = 0; i < imgspath.size(); i++)
 	{
 		int st = 0;
@@ -42,18 +24,13 @@ void Facenet::datasetExtract(string dataset, string aligned)
 			if (imgspath[i][j] == '\\')imgspath[i][j] = '/';
 			if (imgspath[i][j] == '/')st = j + 1;
 		}
-		int ed = imgspath[i].find("_align");
-		int len = ed - st;
-		if (len <= 0)continue;
-		
+
 		cv::Mat img = cv::imread(imgspath[i]);
 		if (img.empty())continue;
 		cv::Mat feat = featureExtract(img);
 		_feat.push_back(feat);
-		
-		_vimgname.push_back(imgspath[i].substr(st, len) + ".jpg");
+		_vimgname.push_back(imgspath[i]);
 	}
-
 }
 
 

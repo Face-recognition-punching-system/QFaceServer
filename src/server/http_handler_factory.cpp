@@ -1,6 +1,7 @@
 #include "http_handler_factory.h"
 #include "admin_http_handler.h"
 #include "user_http_handler.h"
+#include "video_http_handler.h"
 #include "intercept_http_handler.h"
 
 Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
@@ -48,6 +49,9 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
     }
     else if (uri == "/admin/updateWorkerImg" && method == "POST" && contentType == "application/json") {
         return new AdminUpdateWorkerImgRequestHandler;
+    }
+    else if (uri == "/video/faceReco" && method == "POST" && contentType == "application/json") {
+        return new VideoFaceRecoHandler;
     }
     else {
         return new InterceptHttpHandler;

@@ -1,7 +1,6 @@
 #include "http_server.h"
 #include "http_handler_factory.h"
 #include "database_pool.h"
-#include "../config/config.h"
 
 HttpApplication::HttpApplication() {
     _httpSvr = nullptr;

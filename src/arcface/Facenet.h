@@ -9,10 +9,10 @@ using namespace std;
 class Facenet
 {
 public:
-	Facenet(string modelpb, string modeltxt);
+	Facenet();
 	cv::Mat featureExtract(const cv::Mat& img);
 	double getSimilarity(const cv::Mat& feat1, const cv::Mat& feat2);
-	void datasetExtract(string dataset, string aligned);
+	void datasetExtract();
 	string faceRecognition(cv::Mat& feat, double threshold);
 private:
 	cv::dnn::Net _net;

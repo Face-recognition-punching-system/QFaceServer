@@ -17,6 +17,7 @@ Database::~Database() {
 	if (_connection != nullptr) {
 		mysql_close(_connection);
 	}
+
 	auto logger = Logger::getInstance();
 	logger->information("database uninitialize");
 }
