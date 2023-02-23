@@ -65,10 +65,11 @@ bool RedisPool::set(std::string& key, std::string& value) {
 	}
 
 	if (_redis->exists(key)) {
-		return _redis->set(key, value, std::chrono::days(7), sw::redis::UpdateType::EXIST);
+		_redis->del(key);
+		return _redis->set(key, value, std::chrono::seconds(241920), sw::redis::UpdateType::ALWAYS);
 	}
 	else {
-		return _redis->set(key, value, std::chrono::days(7), sw::redis::UpdateType::NOT_EXIST);
+		return _redis->set(key, value, std::chrono::seconds(241920), sw::redis::UpdateType::ALWAYS);
 	}
 	
 }

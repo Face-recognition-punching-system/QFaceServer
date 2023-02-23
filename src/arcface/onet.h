@@ -1,12 +1,9 @@
 #ifndef _include_opencv_onet_h_
 #define _include_opencv_onet_h_
 
-#include "face.h"
 #include <opencv2/dnn.hpp>
-/// <summary>
-/// 该层比 R-Net 层又多了一层卷积层，所以处理的结果会更精细。作用和 R-Net 层作用一样。
-/// 但是该层对人脸区域进行了更多的监督，同时还会输出 人脸的5 个 Landmark（界标）。
-/// </summary>
+
+#include "face.h"
 class OutputNetwork {
 public:
   struct Config {

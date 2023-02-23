@@ -10,6 +10,7 @@
 #include <io.h>
 #include <direct.h>
 #include <mutex>
+#include <opencv2/opencv.hpp>
 
 class AdminSignInRequestHandler : public Poco::Net::HTTPRequestHandler {
 public:

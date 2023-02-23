@@ -7,11 +7,13 @@
 void VideoFaceRecoHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
 	std::string body("");
 	res.setContentType("application/json");
-	res.add("Access-Control-Allow-Origin", "*");
-	res.add("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE");
-	res.add("Access-Control-Max-Age", "3600");
-	res.add("Access-Control-Allow-Headers", "x-requested-with,content-type");
-	res.add("Access-Control-Allow-Credentials", "true");
+	/**
+	 * 	res.add("Access-Control-Allow-Origin", "*");
+	 *  res.add("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE");
+	 *  res.add("Access-Control-Max-Age", "3600");
+	 *  res.add("Access-Control-Allow-Headers", "x-requested-with,content-type");
+	 *  res.add("Access-Control-Allow-Credentials", "true");
+	 */
 	std::string data(std::istreambuf_iterator<char>(req.stream()), {});
 	try {
 		Poco::JSON::Parser parser;
@@ -22,9 +24,13 @@ void VideoFaceRecoHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco
 			try {
 				std::string base64 = object->get("img");
 				cv::Mat img = utils::Base2Mat(base64);
-				std::vector<Face> faces = detectorHandler->detect(img);
-				if (faces.size() != 1) {
+				cv::Mat face = detectorHandler->detect(img);
+				if (face.empty()) {
 					body = utils::body("fail");
+				}
+				else {
+					std::string str = facenetHandler->faceRecognition(face);
+					body = utils::body(str.c_str());
 				}
 			}
 			catch (cv::Exception& e) {

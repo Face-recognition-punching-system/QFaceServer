@@ -1,6 +1,6 @@
 #include "detector_handler.h"
 
-std::unique_ptr<DetectorHandler> DetectorHandler::_instance(new(std::nothrow) DetectorHandler(), destoryInstance);
+std::shared_ptr<DetectorHandler> DetectorHandler::_instance(new(std::nothrow) DetectorHandler(), destoryInstance);
 
 void DetectorHandler::destoryInstance(DetectorHandler* instance) {
 	delete instance;
@@ -14,11 +14,11 @@ DetectorHandler::~DetectorHandler() {
 	delete _detector;
 }
 
-std::unique_ptr<DetectorHandler> DetectorHandler::getInstance() {
+std::shared_ptr<DetectorHandler> DetectorHandler::getInstance() {
 	return _instance;
 }
 
-std::vector<cv::Mat> DetectorHandler::detect(const cv::Mat& img) {
+cv::Mat DetectorHandler::detect(const cv::Mat& img) {
 	int h = img.rows;
 	int w = img.cols;
 	float scale = 1.0;
@@ -31,13 +31,13 @@ std::vector<cv::Mat> DetectorHandler::detect(const cv::Mat& img) {
 		cv::resize(img, scimg, cv::Size(w, h), 0, 0, 3);
 	}
 
-	std::vector<Face> faces = _detector->detect(img, 20.f, 0.5f, 0.709f);
-	for (int i = 0; i < faces.size(); i++)
-	{
-		//·Å´ó¼ì²â¿ò
-		faces[i].faceScale(scale);
+	cv::Mat face;
+	std::vector<Face> faces = _detector->detect(scimg, 20.f, 0.5f, 0.709f);
+	std::cout << faces.size() << std::endl;
+	if (faces.size() == 1) {
+		faces[0].faceScale(scale);
+		face = _detector->faceAlign(img, faces[0]);
 	}
 
-	std::vector<Face> def{ faces[i] };
-	return _detector->faceAlign(img, def);
+	return face;
 }

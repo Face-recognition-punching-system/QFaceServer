@@ -3,9 +3,9 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
+
 const float IMG_MEAN = 127.5f;
 const float IMG_INV_STDDEV = 1.f / 128.f;
-//裁剪图像
 inline cv::Mat cropImage(const cv::Mat& img, cv::Rect r) {
     cv::Mat m = cv::Mat::zeros(r.height, r.width, img.type());
     int dx = std::abs(std::min(0, r.x));
@@ -28,7 +28,6 @@ inline cv::Mat cropImage(const cv::Mat& img, cv::Rect r) {
     return m;
 }
 
-//将图像转换为模型输入
 inline cv::Mat convertImg(const cv::Mat& img) {
     cv::Mat rgbImg;
     if (img.channels() == 3) {
@@ -41,7 +40,7 @@ inline cv::Mat convertImg(const cv::Mat& img) {
     rgbImg.convertTo(rgbImg, CV_32FC3);
     return rgbImg;
 }
-//tf.image.per_image_standardization
+
 inline cv::Mat imgStandardization(const cv::Mat& img)
 {
     cv::Mat imgs;
@@ -53,7 +52,5 @@ inline cv::Mat imgStandardization(const cv::Mat& img)
     imgs = (img - mean) / adjusted_std;
     return imgs;
 }
-
-
 
 #endif

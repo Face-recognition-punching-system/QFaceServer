@@ -72,8 +72,6 @@ std::vector<Face> ProposalNetwork::run(const cv::Mat &img,
     cv::Mat resizedImg;
     cv::resize(img, resizedImg, cv::Size(imgWidth, imgHeight), 0, 0,
                cv::INTER_AREA);
-
-    // feed it to the proposal network
     cv::Mat inputBlob =
         cv::dnn::blobFromImage(resizedImg, IMG_INV_STDDEV, cv::Size(),
                                cv::Scalar(IMG_MEAN, IMG_MEAN, IMG_MEAN), false);

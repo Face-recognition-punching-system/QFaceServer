@@ -3,6 +3,8 @@
 #include "redis_pool.h"
 #include "logger.h"
 #include "utils.h"
+#include "../arcface/detector_handler.h"
+#include "../arcface/facenet_handler.h"
 
 void AdminSignInRequestHandler::handleRequest(
     Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
@@ -419,8 +421,16 @@ void AdminUpdateWorkerImgRequestHandler::handleRequest(
 
 					cv::Mat img = utils::Base2Mat(base64);
 					std::unique_lock<std::mutex> lock(_mutex);
-					cv::imwrite(path, img);
-					body = utils::body("success");
+					auto detectorHandler = DetectorHandler::getInstance();
+					auto facenetHandler = FacenetHandler::getInstance();
+					cv::Mat face = detectorHandler->detect(img);
+					if (face.empty()) {
+						body = utils::body("fail");
+					}
+					else{
+						cv::imwrite(path, face);
+						body = utils::body("success");
+					}
 				}
 				catch (cv::Exception &e) {
 					e.formatMessage();

@@ -1,32 +1,27 @@
 #include "Facenet.h"
 #include "utils.h"
+
 Facenet::Facenet()
 {
 	_net = cv::dnn::readNetFromTensorflow("model/facenet.pb");
 	if (_net.empty()) {
-		cout << "facenet加载失败" << endl;
 		throw std::invalid_argument("facenet loading error");
 	}
 }
 
 void Facenet::datasetExtract()
 {
-	//提取对齐的图片特征
 	_feat.clear();
 	_vimgname.clear();
-	vector<string> imgspath;
+	std::vector<std::string> imgspath;
 	cv::glob("img/*.jpg", imgspath);
 	for (int i = 0; i < imgspath.size(); i++)
 	{
-		int st = 0;
-		for (int j = 0; j < imgspath[i].size(); j++)
-		{
-			if (imgspath[i][j] == '\\')imgspath[i][j] = '/';
-			if (imgspath[i][j] == '/')st = j + 1;
+		cv::Mat img = cv::imread(imgspath[i]);
+		if (img.empty()) {
+			continue;
 		}
 
-		cv::Mat img = cv::imread(imgspath[i]);
-		if (img.empty())continue;
 		cv::Mat feat = featureExtract(img);
 		_feat.push_back(feat);
 		_vimgname.push_back(imgspath[i]);
@@ -36,30 +31,21 @@ void Facenet::datasetExtract()
 
 cv::Mat Facenet::featureExtract(const cv::Mat& img)
 {
-	
-	//图像转浮点，并标准化
 	cv::Mat fimg = convertImg(img);
-
-	//img = imgStandardization(img);
-	//cv::Mat inputBlob =	cv::dnn::blobFromImage(img, 1.0, cv::Size(160,160));
 	cv::Mat inputBlob = cv::dnn::blobFromImage(fimg, IMG_INV_STDDEV, cv::Size(160, 160),
 		cv::Scalar(IMG_MEAN, IMG_MEAN, IMG_MEAN), false);
-
-	//设置模型输入
 	_net.setInput(inputBlob);
-	//前向传播
-	vector<cv::Mat> outputBlobs;
+	std::vector<cv::Mat> outputBlobs;
 	_net.forward(outputBlobs);
 	return outputBlobs[0].clone();
 }
 
 double Facenet::getSimilarity(const cv::Mat& feat1, const cv::Mat& feat2)
 {
-	//欧式距离
 	return cv::norm(feat1 - feat2);
 }
-//寻找数据库中最相似的特征
-string Facenet::faceRecognition(cv::Mat& feat, double threshold)
+
+std::string Facenet::faceRecognition(cv::Mat& feat, double threshold)
 {
 	int id = -1;
 	double mins = 0.;

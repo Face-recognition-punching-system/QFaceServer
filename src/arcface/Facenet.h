@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-using namespace std;
+
 class Facenet
 {
 public:
@@ -13,11 +13,11 @@ public:
 	cv::Mat featureExtract(const cv::Mat& img);
 	double getSimilarity(const cv::Mat& feat1, const cv::Mat& feat2);
 	void datasetExtract();
-	string faceRecognition(cv::Mat& feat, double threshold);
+	std::string faceRecognition(cv::Mat& feat, double threshold);
 private:
 	cv::dnn::Net _net;
-	vector<cv::Mat> _feat;
-	vector<string> _vimgname;
-	map<string, string> _nametolabel;
+	std::vector<cv::Mat> _feat;
+	std::vector<std::string> _vimgname;
+	std::map<std::string, std::string> _nametolabel;
 };
 

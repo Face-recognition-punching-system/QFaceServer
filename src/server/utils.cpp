@@ -1,6 +1,12 @@
 #include "utils.h"
 #include "iconv.h"
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="message"></param>
+/// <param name="detail"></param>
+/// <returns></returns>
 std::string utils::body(std::string&& message, std::string&& detail) {
 	Poco::JSON::Object object;
 	object.set("message", message);
@@ -10,6 +16,11 @@ std::string utils::body(std::string&& message, std::string&& detail) {
 	return ostream.str();
 }
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="message"></param>
+/// <returns></returns>
 std::string utils::body(std::string&& message) {
 	Poco::JSON::Object object;
 	object.set("message", message);
@@ -18,6 +29,11 @@ std::string utils::body(std::string&& message) {
 	return ostream.str();
 }
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="utf8"></param>
+/// <returns></returns>
 std::string utils::U2G(const std::string utf8)
 {
 	double len = static_cast<double>(MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0));
@@ -32,6 +48,11 @@ std::string utils::U2G(const std::string utf8)
 	return str;
 }
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="gb2312"></param>
+/// <returns></returns>
 std::string utils::G2U(const std::string gb2312)
 {
 	double len = static_cast<double>(MultiByteToWideChar(CP_ACP, 0, gb2312.c_str(), -1, NULL, 0));
