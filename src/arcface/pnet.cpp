@@ -75,17 +75,12 @@ std::vector<Face> ProposalNetwork::run(const cv::Mat &img,
     cv::Mat inputBlob =
         cv::dnn::blobFromImage(resizedImg, IMG_INV_STDDEV, cv::Size(),
                                cv::Scalar(IMG_MEAN, IMG_MEAN, IMG_MEAN), false);
-
     _net.setInput(inputBlob, "data");
-
     const std::vector<cv::String> outBlobNames{"conv4-2", "prob1"};
     std::vector<cv::Mat> outputBlobs;
-
     _net.forward(outputBlobs, outBlobNames);
-
     cv::Mat regressionsBlob = outputBlobs[0];
     cv::Mat scoresBlob = outputBlobs[1];
-
     auto faces =
         buildFaces(scoresBlob, regressionsBlob, currentScale, _threshold);
 

@@ -18,6 +18,5 @@ private:
 	cv::dnn::Net _net;
 	std::vector<cv::Mat> _feat;
 	std::vector<std::string> _vimgname;
-	std::map<std::string, std::string> _nametolabel;
 };
 

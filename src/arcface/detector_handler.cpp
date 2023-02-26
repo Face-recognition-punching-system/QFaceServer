@@ -23,8 +23,7 @@ cv::Mat DetectorHandler::detect(const cv::Mat& img) {
 	int w = img.cols;
 	float scale = 1.0;
 	cv::Mat scimg(img);
-	if (h > 108)
-	{
+	if (h > 108){
 		scale = h / 108.0;
 		h = h / scale;
 		w = w / scale;

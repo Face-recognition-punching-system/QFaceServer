@@ -8,7 +8,7 @@
 #include <memory>
 #include <opencv2/opencv.hpp>
 
-class VideoFaceRecoHandler : public Poco::Net::HTTPRequestHandler {
+class VideoRecoHandler : public Poco::Net::HTTPRequestHandler {
 public:
 	void handleRequest(Poco::Net::HTTPServerRequest&, Poco::Net::HTTPServerResponse&);
 };

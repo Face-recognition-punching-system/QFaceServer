@@ -10,6 +10,7 @@ RefineNetwork::RefineNetwork(const RefineNetwork::Config &config) {
   if (_net.empty()) {
     throw std::invalid_argument("invalid protoText or caffeModel");
   }
+
   _threshold = config.threshold;
 }
 
@@ -18,7 +19,6 @@ RefineNetwork::~RefineNetwork() {}
 std::vector<Face> RefineNetwork::run(const cv::Mat &img,
                                      const std::vector<Face> &faces) {
   cv::Size windowSize = cv::Size(INPUT_DATA_WIDTH, INPUT_DATA_HEIGHT);
-
   std::vector<cv::Mat> inputs;
   for (auto &f : faces) {
     cv::Mat roi = cropImage(img, f.bbox.getRect());
@@ -26,26 +26,18 @@ std::vector<Face> RefineNetwork::run(const cv::Mat &img,
     inputs.push_back(roi);
   }
 
-
   auto blobInputs =
       cv::dnn::blobFromImages(inputs, IMG_INV_STDDEV, cv::Size(),
                               cv::Scalar(IMG_MEAN, IMG_MEAN, IMG_MEAN), false);
-
   _net.setInput(blobInputs, "data");
-
   const std::vector<cv::String> outBlobNames{"conv5-2", "prob1"};
   std::vector<cv::Mat> outputBlobs;
-
   _net.forward(outputBlobs, outBlobNames);
-
   cv::Mat regressionsBlob = outputBlobs[0];
   cv::Mat scoresBlob = outputBlobs[1];
-
   std::vector<Face> totalFaces;
-
   const float *scores_data = (float *)scoresBlob.data;
   const float *reg_data = (float *)regressionsBlob.data;
-
   for (int k = 0; k < faces.size(); ++k) {
     if (scores_data[2 * k + 1] >= _threshold) {
       Face info = faces[k];

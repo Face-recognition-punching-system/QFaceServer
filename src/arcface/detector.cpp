@@ -73,6 +73,7 @@ void getAffineMatrix(double* src_5pts, const double* dst_5pts, double* M)
         dst[i] -= ptmp[0];
         dst[5 + i] -= ptmp[1];
     }
+
     double dst_x = (dst[3] + dst[4] - dst[0] - dst[1]) / 2, dst_y = (dst[8] + dst[9] - dst[5] - dst[6]) / 2;
     double src_x = (src[3] + src[4] - src[0] - src[1]) / 2, src_y = (src[8] + src[9] - src[5] - src[6]) / 2;
     double theta = atan2(dst_x, dst_y) - atan2(src_x, src_y);
@@ -87,6 +88,7 @@ void getAffineMatrix(double* src_5pts, const double* dst_5pts, double* M)
         pts0[0] += (dst[i] - pts1[i]);
         pts0[1] += (dst[i + 5] - pts1[i + 5]);
     }
+
     pts0[0] /= 5;
     pts0[1] /= 5;
 
@@ -107,14 +109,15 @@ void getAffineMatrix(double* src_5pts, const double* dst_5pts, double* M)
             _a += ((pts0[0] - dst[i]) * src[i + 5] - (pts0[1] - dst[i + 5]) * src[i]);
             _b += ((pts0[0] - dst[i]) * src[i] + (pts0[1] - dst[i + 5]) * src[i + 5]);
         }
+
         if (_b < 0) {
             _b = -_b;
             _a = -_a;
         }
+
         double _s = sqrt(_a * _a + _b * _b);
         _b /= _s;
         _a /= _s;
-
         for (int i = 0; i < 5; ++i) {
             pts1[i] = scale * (src[i] * _b + src[i + 5] * _a);
             pts1[i + 5] = scale * (-src[i] * _a + src[i + 5] * _b);
@@ -124,29 +127,31 @@ void getAffineMatrix(double* src_5pts, const double* dst_5pts, double* M)
         for (int i = 0; i < 5; ++i) {
             _scale += ((dst[i] - pts0[0]) * pts1[i] + (dst[i + 5] - pts0[1]) * pts1[i + 5]);
         }
+
         _scale /= (square_sum * scale);
         for (int i = 0; i < 10; ++i) {
             pts1[i] *= (_scale / scale);
         }
-        scale = _scale;
 
-        // determine pts0
+        scale = _scale;
         pts0[0] = pts0[1] = 0;
         for (int i = 0; i < 5; ++i) {
             pts0[0] += (dst[i] - pts1[i]);
             pts0[1] += (dst[i + 5] - pts1[i + 5]);
         }
+
         pts0[0] /= 5;
         pts0[1] /= 5;
-
         double _sqloss = 0;
         for (int i = 0; i < 5; ++i) {
             _sqloss += ((pts0[0] + pts1[i] - dst[i]) * (pts0[0] + pts1[i] - dst[i])
                 + (pts0[1] + pts1[i + 5] - dst[i + 5]) * (pts0[1] + pts1[i + 5] - dst[i + 5]));
         }
+
         if (abs(_sqloss - sqloss) < 1e-2) {
             break;
         }
+
         sqloss = _sqloss;
     }
 
@@ -170,7 +175,6 @@ cv::Mat MTCNNDetector::faceAlign(const cv::Mat& img, const Face& face)
     double coord5point2[10] = { 30.2946 + 8.0000, 65.5318 + 8.0000, 
         48.0252 + 8.0000, 33.5493 + 8.0000, 62.7299 + 8.0000, 51.6963, 
         51.5014, 71.7366, 92.3655, 92.2041 };
-
 	int x1 = face.bbox.x1;
 	int y1 = face.bbox.y1;
 	int x2 = face.bbox.x2;

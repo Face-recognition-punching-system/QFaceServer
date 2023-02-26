@@ -4,7 +4,7 @@
 #include "../arcface/detector_handler.h"
 #include "../arcface/facenet_handler.h"
 
-void VideoFaceRecoHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+void VideoRecoHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
 	std::string body("");
 	res.setContentType("application/json");
 	/**

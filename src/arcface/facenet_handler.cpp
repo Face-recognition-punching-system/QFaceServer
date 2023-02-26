@@ -26,5 +26,5 @@ void FacenetHandler::datasetExtract() {
 
 std::string FacenetHandler::faceRecognition(cv::Mat& face) {
 	cv::Mat feat = _facenet->featureExtract(face);
-	return _facenet->faceRecognition(feat, 1.1);
+	return _facenet->faceRecognition(feat, 1.06);
 }

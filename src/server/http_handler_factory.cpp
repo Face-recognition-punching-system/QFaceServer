@@ -14,7 +14,7 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
     if (uri == "/user/signIn" && method == "POST" && contentType == "application/json") {
         return new UserSignInRequestHandler;
     }
-    else if(uri == "/userr/reco" && method == "POST" && contentType == "application/json") {
+    else if(uri == "/user/reco" && method == "POST" && contentType == "application/json") {
         return new UserRecoRequestHandler;
     }
     else if (uri == "/admin/signIn" && method == "POST" && contentType == "application/json") {
@@ -50,8 +50,8 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
     else if (uri == "/admin/updateWorkerImg" && method == "POST" && contentType == "application/json") {
         return new AdminUpdateWorkerImgRequestHandler;
     }
-    else if (uri == "/video/faceReco" && method == "POST" && contentType == "application/json") {
-        return new VideoFaceRecoHandler;
+    else if (uri == "/video/reco" && method == "POST" && contentType == "application/json") {
+        return new VideoRecoHandler;
     }
     else {
         return new InterceptHttpHandler;

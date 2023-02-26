@@ -29,22 +29,16 @@ std::vector<Face> OutputNetwork::run(const cv::Mat &img,
     auto blobInput =
         cv::dnn::blobFromImage(roi, IMG_INV_STDDEV, cv::Size(),
                                cv::Scalar(IMG_MEAN, IMG_MEAN, IMG_MEAN), false);
-
     _net.setInput(blobInput, "data");
-
     const std::vector<cv::String> outBlobNames{"conv6-2", "conv6-3", "prob1"};
     std::vector<cv::Mat> outputBlobs;
-
     _net.forward(outputBlobs, outBlobNames);
-
     cv::Mat regressionsBlob = outputBlobs[0];
     cv::Mat landMarkBlob = outputBlobs[1];
     cv::Mat scoresBlob = outputBlobs[2];
-
     const float *scores_data = (float *)scoresBlob.data;
     const float *landmark_data = (float *)landMarkBlob.data;
     const float *reg_data = (float *)regressionsBlob.data;
-
     if (scores_data[1] >= _threshold) {
       Face info = f;
       info.score = scores_data[1];
@@ -54,7 +48,6 @@ std::vector<Face> OutputNetwork::run(const cv::Mat &img,
 
       float w = info.bbox.x2 - info.bbox.x1 + 1.f;
       float h = info.bbox.y2 - info.bbox.y1 + 1.f;
-
       for (int p = 0; p < NUM_PTS; ++p) {
         info.ptsCoords[2 * p] =
             info.bbox.x1 + landmark_data[NUM_PTS + p] * w - 1;
@@ -67,6 +60,5 @@ std::vector<Face> OutputNetwork::run(const cv::Mat &img,
 
   Face::applyRegression(totalFaces, true);
   totalFaces = Face::runNMS(totalFaces, 0.7f, true);
-
   return totalFaces;
 }
