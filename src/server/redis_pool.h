@@ -2,7 +2,6 @@
 #define REDIS_H
 
 #include <memory>
-#include <format>
 #include <sw/redis++/redis++.h>
 #include <sw/redis++/sentinel.h>
 #include <sw/redis++/connection.h>

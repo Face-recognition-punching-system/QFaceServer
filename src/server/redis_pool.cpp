@@ -1,6 +1,8 @@
+#include <format>
+
 #include "redis_pool.h"
-#include "../config/config.h"
 #include "logger.h"
+#include "../config/config.h"
 
 std::shared_ptr<RedisPool> RedisPool::_instance(new(std::nothrow) RedisPool(), RedisPool::destroyInstance);
 

@@ -34,8 +34,7 @@ bool Database::connect() {
 		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return false;
-	}
-	else {
+	} else {
 		logger->information("database connect success\n");
 		return true;
 	}
@@ -49,12 +48,12 @@ std::string Database::create(std::string& query) {
 		int affect = static_cast<int>(mysql_affected_rows(_connection));
 		if (affect == 0) {
 			return utils::body("error", "please check params are exist");
-		}else if(affect == -1) {
+		} else if (affect == -1) {
 			return utils::body("unknown error");
-		}else {
+		} else {
 			return utils::body("success");
 		}
-	}else {
+	} else {
 		auto logger = Logger::getInstance();
 		int code = static_cast<int>(mysql_errno(_connection));
 		std::string message = static_cast<std::string>(mysql_error(_connection));
@@ -73,7 +72,7 @@ std::string Database::readOne(std::string& query, std::initializer_list<std::str
 		int fields = static_cast<int>(mysql_num_fields(res));
 		std::cout << std::format("rows = {} fileds = {}\n", rows, fields) << std::endl;
 		MYSQL_ROW line = mysql_fetch_row(res);
-		if (rows){
+		if (rows) {
 			Poco::JSON::Object object;
 			int i = 0;
 			for (auto& r : rest) {
@@ -85,13 +84,11 @@ std::string Database::readOne(std::string& query, std::initializer_list<std::str
 			object.stringify(ostream);
 			mysql_free_result(res);
 			return utils::G2U(ostream.str());
-		}
-		else{
+		} else {
 			mysql_free_result(res);
 			return "{}";
 		}
-
-	}else {
+	} else {
 		auto logger = Logger::getInstance();
 		int code = static_cast<int>(mysql_errno(_connection));
 		std::string message = static_cast<std::string>(mysql_error(_connection));
@@ -127,13 +124,11 @@ std::string Database::read(std::string& query, std::initializer_list<std::string
 			array.stringify(ostream);
 			mysql_free_result(res);
 			return utils::G2U(ostream.str());
-		}
-		else {
+		} else {
 			mysql_free_result(res);
 			return "[]";
 		}
-
-	}else {
+	} else {
 		auto logger = Logger::getInstance();
 		int code = static_cast<int>(mysql_errno(_connection));
 		std::string message = static_cast<std::string>(mysql_error(_connection));
@@ -150,12 +145,12 @@ std::string Database::update(std::string& query) {
 		int affect = static_cast<int>(mysql_affected_rows(_connection));
 		if (affect == 0) {
 			return utils::body("error", "nothing need to update");
-		}else if (affect == -1) {
+		} else if (affect == -1) {
 			return utils::body("unknown error");
-		}else {
+		} else {
 			return utils::body("success");
 		}
-	}else {
+	} else {
 		auto logger = Logger::getInstance();
 		int code = static_cast<int>(mysql_errno(_connection));
 		std::string message = static_cast<std::string>(mysql_error(_connection));
@@ -172,33 +167,16 @@ std::string Database::del(std::string& query) {
 		int affect = static_cast<int>(mysql_affected_rows(_connection));
 		if (affect == 0) {
 			return utils::body("error", "nothing need to delete");
-		}else if (affect == -1) {
+		} else if (affect == -1) {
 			return utils::body("unknown error");
-		}else {
+		} else {
 			return utils::body("success");
 		}
-	}else {
+	} else {
 		auto logger = Logger::getInstance();
 		int code = static_cast<int>(mysql_errno(_connection));
 		std::string message = static_cast<std::string>(mysql_error(_connection));
 		logger->information(std::format("{} {}\n", message, code));
 		return utils::body("unknown error");
 	}
-
 }
-
-/*
-try {
-		std::stringstream sstream;
-		Poco::MongoDB::Connection::SocketFactory socketFactory = Poco::MongoDB::Connection::SocketFactory();
-		sstream << "mongodb://" << username << ":" << password << "@" << host << ":" << port << "/" << database;
-		_connection.connect(sstream.str(), socketFactory);
-		_state = true;
-		auto logger = Logger::getInstance();
-		logger->information("database initialize\n");
-	}
-	catch (const Poco::Exception& error) {
-		std::printf("%s\n", error.displayText().c_str());
-		throw error;
-	}
-*/

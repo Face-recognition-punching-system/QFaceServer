@@ -4,9 +4,6 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/JSON/Parser.h>
-#include <memory>
-#include <opencv2/opencv.hpp>
 
 class VideoRecoHandler : public Poco::Net::HTTPRequestHandler {
 public:

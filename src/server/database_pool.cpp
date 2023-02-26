@@ -4,7 +4,7 @@ DatabasePool* DatabasePool::_instance(nullptr);
 
 std::mutex DatabasePool::_mutex;
 
-DatabasePool::DatabasePool():_initSize(2), _maxSize(2), _maxIdleTime(60), _connectionTimeout(100){
+DatabasePool::DatabasePool() :_initSize(2), _maxSize(2), _maxIdleTime(60), _connectionTimeout(100) {
 	if (!loadConfigFile()) {
 		return;
 	}
@@ -48,29 +48,21 @@ bool DatabasePool::loadConfigFile() {
 		std::string value = str.substr(idx + 1, endidx - idx - 1);
 		if (key == "ip") {
 			std::string ip = value;
-		}
-		else if (key == "port") {
+		} else if (key == "port") {
 			int port = std::atoi(value.c_str());
-		}
-		else if (key == "dbname") {
+		} else if (key == "dbname") {
 			std::string dbname = value;
-		}
-		else if (key == "username") {
+		} else if (key == "username") {
 			std::string username = value;
-		}
-		else if (key == "password") {
+		} else if (key == "password") {
 			std::string password = value;
-		}
-		else if (key == "initSize") {
+		} else if (key == "initSize") {
 			int initSize = std::atoi(value.c_str());
-		}
-		else if (key == "maxSize") {
+		} else if (key == "maxSize") {
 			int maxSize = std::atoi(value.c_str());
-		}
-		else if (key == "maxIdleTime") {
+		} else if (key == "maxIdleTime") {
 			int maxIdleTime = std::atoi(value.c_str());
-		}
-		else if (key == "connectionTimeout") {
+		} else if (key == "connectionTimeout") {
 			int connectionTimeout = std::atoi(value.c_str());
 		}
 	}
@@ -106,8 +98,7 @@ void DatabasePool::scannerConnectionTask() {
 				_databaseQue.pop();
 				_databaseCnt--;
 				delete p;
-			}
-			else {
+			} else {
 				break;
 			}
 		}
@@ -132,8 +123,7 @@ void DatabasePool::destroyInstance() {
 	}
 }
 
-std::shared_ptr<Database> DatabasePool::getDatabase()
-{
+std::shared_ptr<Database> DatabasePool::getDatabase() {
 	std::unique_lock<std::mutex> lock(_queueMutex);
 	while (_databaseQue.empty()) {
 		if (std::cv_status::timeout == cv.wait_for(lock, std::chrono::milliseconds(_connectionTimeout))) {

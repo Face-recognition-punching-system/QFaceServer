@@ -2,10 +2,6 @@
 #define UTILS_H
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgcodecs/legacy/constants_c.h>
-#include <Poco/JSON/Parser.h>
-#include <string.h>
-#include <stdlib.h>
 
 namespace utils {
 	std::string body(std::string&&, std::string&&);

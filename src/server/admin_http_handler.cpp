@@ -7,7 +7,7 @@
 #include "../arcface/facenet_handler.h"
 
 void AdminSignInRequestHandler::handleRequest(
-    Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+	Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
 	std::string body("");
 	res.setContentType("application/json");
 	std::string data(std::istreambuf_iterator<char>(req.stream()), {});
@@ -32,23 +32,21 @@ void AdminSignInRequestHandler::handleRequest(
 					body = utils::body("unknown error");
 				}
 			}
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
 		body = utils::body("json parser error");
 	}
 
-    res.sendBuffer(body.c_str(), body.length());
+	res.sendBuffer(body.c_str(), body.length());
 }
 
 void AdminUpdatePasswordRequestHandler::handleRequest(
-    Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+	Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
 	std::string body("");
 	res.setContentType("application/json");
 	std::string data(std::istreambuf_iterator<char>(req.stream()), {});
@@ -57,12 +55,12 @@ void AdminUpdatePasswordRequestHandler::handleRequest(
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (!object->has("csrfToken")) {
 			body = utils::body("authentication failure");
-		}else if (object->has("password") && object->has("id") && object->size() == 3) {
+		} else if (object->has("password") && object->has("id") && object->size() == 3) {
 			std::string id = object->get("id");
 			std::string csrfToken = object->get("csrfToken");
 			auto rp = RedisPool::getInstance();
 			std::string res = rp->get(id);
-			if (res!= "" && res == csrfToken) {
+			if (res != "" && res == csrfToken) {
 				body = utils::body("unknown error");
 				DatabasePool* dbp = DatabasePool::getInstance();
 				std::shared_ptr<Database> db = dbp->getDatabase();
@@ -71,29 +69,26 @@ void AdminUpdatePasswordRequestHandler::handleRequest(
 					"update qface.admin set password = \"{}\" where id = \"{}\"",
 					password, id);
 				body = db->update(query);
-			}
-			else {
+			} else {
 				body = utils::body("signOut");
 			}
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
 		body = utils::body("json parser error");
 	}
 
-    res.sendBuffer(body.c_str(), body.length());
+	res.sendBuffer(body.c_str(), body.length());
 }
 
 void AdminGetWorkerInfoRequestHandler::handleRequest(
-    Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
-    std::string body("");
-    res.setContentType("application/json");
+	Poco::Net::HTTPServerRequest& req, Poco::Net::HTTPServerResponse& res) {
+	std::string body("");
+	res.setContentType("application/json");
 	std::string data(std::istreambuf_iterator<char>(req.stream()), {});
 	Poco::JSON::Parser parser;
 	try {
@@ -104,12 +99,10 @@ void AdminGetWorkerInfoRequestHandler::handleRequest(
 			std::string query = "select id, workerId, name, age, department from qface.worker";
 			body = db->read(query,
 				{ "id", "workerId", "name", "age", "department" });
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -133,12 +126,10 @@ void AdminGetClockRequestHandler::handleRequest(
 			std::string query = "select workerid, name, create_time from clock left join worker on clock.wid = worker.id where to_days(create_time) = to_days(now())";
 			body = db->read(query,
 				{ "workerId", "name", "create_time" });
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -162,12 +153,10 @@ void AdminGetNotClockRequestHandler::handleRequest(
 			std::string query = "select workerId, name from worker where id not in(select wid as id from clock where (to_days(create_time) = to_days(now())))";
 			body = db->read(query,
 				{ "workerId", "name" });
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -188,8 +177,7 @@ void AdminGetWorkerClockRequestHandler::handleRequest(
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (!object->has("csrfToken")) {
 			body = utils::body("authentication failure");
-		}
-		else if (object->has("wid") && object->has("id") && object->size() == 3) {
+		} else if (object->has("wid") && object->has("id") && object->size() == 3) {
 			std::string csrfToken = object->get("csrfToken");
 			std::string id = object->get("id");
 			auto rp = RedisPool::getInstance();
@@ -201,17 +189,14 @@ void AdminGetWorkerClockRequestHandler::handleRequest(
 				std::string query = std::format(
 					"SELECT id, create_time, img, isClock FROM qface.clock where wid = \"{}\"", wid);
 				body = db->read(query,
-					{ "id", "create_time", "img", "isClock"});
-			}
-			else {
+					{ "id", "create_time", "img", "isClock" });
+			} else {
 				body = utils::body("signOut");
 			}
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -235,12 +220,10 @@ void AdminGetFeedbackRequestHandler::handleRequest(
 			std::string query = "SELECT feedback.id as fid, clock.id as cid, workerId, name, reason, feedback.create_time, res from worker RIGHT join clock on worker.id = clock.wid RIGHT JOIN feedback  on clock.id = feedback.cid where res = \"нч\"";
 			body = db->read(query,
 				{ "fid", "cid", "workerId", "name", "reason", "create_time", "res" });
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -260,8 +243,7 @@ void AdminUpdateFeedbackRequestHandler::handleRequest(
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
 		if (!object->has("csrfToken")) {
 			body = utils::body("authentication failure");
-		}
-		else if (object->has("id") && object->has("fid") && object->has("cid") && object->has("res") && object->size() == 5) {
+		} else if (object->has("id") && object->has("fid") && object->has("cid") && object->has("res") && object->size() == 5) {
 			std::string csrfToken = object->get("csrfToken");
 			std::string id = object->get("id");
 			auto rp = RedisPool::getInstance();
@@ -279,18 +261,15 @@ void AdminUpdateFeedbackRequestHandler::handleRequest(
 				query = std::format(
 					"update clock set isClock = \"{}\" where id = \"{}\"", isClock, cid);
 				body = db->update(query);
-			}
-			else {
+			} else {
 				body = utils::body("signOut");
 			}
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
 
 		res.sendBuffer(body.c_str(), body.length());
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -312,12 +291,10 @@ void AdminGetFeedbackResRequestHandler::handleRequest(
 			std::string query = "SELECT workerId, name, reason, feedback.create_time, res from worker RIGHT join clock on worker.id = clock.wid RIGHT JOIN feedback on clock.id = feedback.cid where res != \"нч\"";
 			body = db->read(query,
 				{ "workerId", "name", "reason", "create_time", "res" });
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -350,8 +327,7 @@ void AdminGetWorkerImgRequestHandler::handleRequest(
 				try {
 					if (_access(path.c_str(), 0) == -1) {
 						body = utils::body("unknown error");
-					}
-					else {
+					} else {
 						cv::Mat img = cv::imread(path);
 						if (!img.empty()) {
 							std::string base64 = utils::Mat2Base64(img, "jpg");
@@ -360,27 +336,21 @@ void AdminGetWorkerImgRequestHandler::handleRequest(
 							o.set("img", base64);
 							o.stringify(ostream);
 							body = ostream.str();
-						}
-						else {
+						} else {
 							body = utils::body("unknown error");
 						}
 					}
-				}
-				catch (cv::Exception& e) {
+				} catch (cv::Exception& e) {
 					e.formatMessage();
 					body = utils::body("unknown error");
 				}
-			}
-			else {
+			} else {
 				body = utils::body("signOut");
 			}
-			
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
@@ -426,27 +396,21 @@ void AdminUpdateWorkerImgRequestHandler::handleRequest(
 					cv::Mat face = detectorHandler->detect(img);
 					if (face.empty()) {
 						body = utils::body("fail");
-					}
-					else{
+					} else {
 						cv::imwrite(path, face);
 						body = utils::body("success");
 					}
-				}
-				catch (cv::Exception &e) {
+				} catch (cv::Exception& e) {
 					e.formatMessage();
 					body = utils::body("unknown error");
 				}
-			}
-			else {
+			} else {
 				body = utils::body("signOut");
 			}
-
-		}
-		else {
+		} else {
 			body = utils::body("param invalid");
 		}
-	}
-	catch (const Poco::JSON::JSONException& e) {
+	} catch (const Poco::JSON::JSONException& e) {
 		auto instance = Logger::getInstance();
 		instance->information(e.displayText());
 		instance->information("\n");
