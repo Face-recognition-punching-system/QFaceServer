@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "database_pool.h"
 
 DatabasePool* DatabasePool::_instance(nullptr);
@@ -19,7 +21,6 @@ DatabasePool::DatabasePool() :_initSize(2), _maxSize(2), _maxIdleTime(60), _conn
 
 	std::thread produce(std::bind(&DatabasePool::produceConnectionTask, this));
 	produce.detach();
-
 	std::thread scanner(std::bind(&DatabasePool::scannerConnectionTask, this));
 	scanner.detach();
 }
@@ -34,12 +35,13 @@ bool DatabasePool::loadConfigFile() {
 	if (pf == nullptr) {
 		return false;
 	}
+
 	while (!feof(pf)) {
 		char line[1024] = { 0 };
 		fgets(line, 1024, pf);
 		std::string str = line;
 		double idx = str.find('=', 0);
-		if (idx == -1) {//无效的配置项
+		if (idx == -1) {
 			continue;
 		}
 

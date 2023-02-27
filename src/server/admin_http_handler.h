@@ -4,13 +4,6 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Net/HTTPServerRequest.h> 
-#include <Poco/JSON/Parser.h>
-#include <format>
-#include <hiredis/hiredis.h>
-#include <io.h>
-#include <direct.h>
-#include <mutex>
-#include <opencv2/opencv.hpp>
 
 class AdminSignInRequestHandler : public Poco::Net::HTTPRequestHandler {
 public:

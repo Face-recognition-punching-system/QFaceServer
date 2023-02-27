@@ -28,24 +28,19 @@ bool RedisPool::initialize() {
 	_pool_options.connection_lifetime = std::chrono::minutes(10);
 	try {
 		_redis = new sw::redis::Redis(_connection_options, _pool_options);
-	}
-	catch (const sw::redis::ReplyError& err) {
+	} catch (const sw::redis::ReplyError& err) {
 		logger->error(std::format("RedisHandler-- ReplyError£º%s {}", err.what()));
 		return false;
-	}
-	catch (const sw::redis::TimeoutError& err) {
+	} catch (const sw::redis::TimeoutError& err) {
 		logger->error(std::format("RedisHandler-- TimeoutError%s \n", err.what()));
 		return false;
-	}
-	catch (const sw::redis::ClosedError& err) {
+	} catch (const sw::redis::ClosedError& err) {
 		logger->error(std::format("RedisHandler-- ClosedError%s \n", err.what()));
 		return false;
-	}
-	catch (const sw::redis::IoError& err) {
+	} catch (const sw::redis::IoError& err) {
 		logger->error(std::format("RedisHandler-- IoError%s \n", err.what()));
 		return false;
-	}
-	catch (const sw::redis::Error& err) {
+	} catch (const sw::redis::Error& err) {
 		logger->error(std::format("RedisHandler-- other% s \n", err.what()));
 		return false;
 	}
@@ -69,11 +64,10 @@ bool RedisPool::set(std::string& key, std::string& value) {
 	if (_redis->exists(key)) {
 		_redis->del(key);
 		return _redis->set(key, value, std::chrono::seconds(241920), sw::redis::UpdateType::ALWAYS);
-	}
-	else {
+	} else {
 		return _redis->set(key, value, std::chrono::seconds(241920), sw::redis::UpdateType::ALWAYS);
 	}
-	
+
 }
 
 std::string RedisPool::get(std::string& key) {
@@ -85,8 +79,7 @@ std::string RedisPool::get(std::string& key) {
 	if (res) {
 		std::string ret = *res;
 		return ret;
-	}
-	else {
+	} else {
 		return "";
 	}
 }
@@ -99,141 +92,7 @@ bool RedisPool::del(std::string& key) {
 
 	if (_redis->del(key)) {
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
-
-
-
-
-//#include "redis.h"
-//#include "logger.h"
-//#include "../config/config.h"
-//
-//bool sendAuth(Poco::Redis::Client* client, const std::string& pwd) {
-//	Poco::Redis::Array cmd;
-//	cmd << "AUTH" << pwd;
-//	std::string response;
-//	auto logger = Logger::getInstance();
-//	try {
-//		response = client->execute<std::string>(cmd);
-//	}
-//	catch (const Poco::Exception& error) {
-//		logger->information(std::format("%s\n", error.displayText().c_str()));
-//		return  false;
-//	}
-//
-//	return (response == "OK");
-//}
-//
-//Redis::Redis() {
-//	auto logger = Logger::getInstance();
-//	logger->information("redis initialize");
-//}
-//
-//Redis::~Redis() {
-//	auto logger = Logger::getInstance();
-//	logger->information("redis uninitialize");
-//}
-//
-//bool Redis::connect() {
-//	auto logger = Logger::getInstance();
-//	try {
-//		_redis = new Poco::Redis::Client(host, redisPort);
-//		if (!sendAuth(_redis, redisPassWord)) {
-//			logger->information("redis connect error");
-//			logger->information("authentication failure!\n");
-//			return false;
-//		}
-//		else {
-//			logger->information("redis connect success\n");
-//			return true;
-//		}
-//	}
-//	catch (Poco::BadCastException& error) {
-//		logger->information("redis connect error");
-//		logger->information(std::format("{}\n", error.displayText().c_str()));
-//		return false;
-//	}
-//	catch (Poco::Redis::RedisException& error) {
-//		logger->information("redis connect error");
-//		logger->information(std::format("{}\n", error.displayText().c_str()));
-//		return false;
-//	}
-//}
-//
-//bool Redis::createData(std::string&& key, std::string&& value) {
-//	auto logger = Logger::getInstance();
-//	Poco::Redis::Command execute = Poco::Redis::Command::set(key, value);
-//	try {
-//		auto ret = _redis->execute<std::string>(execute);
-//		std::cout << ret << std::endl;
-//		return ret == "OK";
-//	}
-//	catch (Poco::Redis::RedisException& error) {
-//		if (_redis->isConnected()) {
-//			logger->information(std::format("{}\n", error.displayText().c_str()));
-//			return false;
-//		}
-//		else {
-//			if (connect()) {
-//				auto ret = _redis->execute<std::string>(execute);
-//				return ret == "OK";
-//			}
-//			else {
-//				return false;
-//			}
-//		}
-//	}
-//}
-//
-//std::string Redis::readData(std::string& key) {
-//	auto logger = Logger::getInstance();
-//	Poco::Redis::Command execute = Poco::Redis::Command::get(key);
-//	try {
-//		auto ret = _redis->execute<Poco::Redis::BulkString>(execute);
-//		return ret.value();
-//	}
-//	catch (Poco::Redis::RedisException& error) {
-//		if (_redis->isConnected()) {
-//			logger->information(std::format("{}\n", error.displayText().c_str()));
-//			return "";
-//		}
-//		else {
-//			if (connect()) {
-//				auto ret = _redis->execute<Poco::Redis::BulkString>(execute);
-//				return ret.value();
-//			}
-//			else {
-//				return "";
-//			}
-//		}
-//	}
-//}
-//
-//bool Redis::delData(std::string&& key) {
-//	auto logger = Logger::getInstance();
-//	Poco::Redis::Command execute = Poco::Redis::Command::del(key);
-//	try {
-//		auto ret = _redis->execute<std::string>(execute);
-//		std::cout << ret << std::endl;
-//		return ret == "OK";
-//	}
-//	catch (Poco::Redis::RedisException& error) {
-//		if (_redis->isConnected()) {
-//			logger->information(std::format("{}\n", error.displayText().c_str()));
-//			return false;
-//		}
-//		else {
-//			if (connect()) {
-//				auto ret = _redis->execute<std::string>(execute);
-//				return ret == "OK";
-//			}
-//			else {
-//				return false;
-//			}
-//		}
-//	}
-//}

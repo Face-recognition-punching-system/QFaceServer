@@ -12,7 +12,7 @@ find_path(HIREDIS_HEADER hiredis)
 find_library(HIREDIS_LIB hiredis)
 find_path(REDIS_PLUS_PLUS_HEADER sw)
 find_library(REDIS_PLUS_PLUS_LIB redis++)
-
+ 
 include_directories(${MYSQL_ROOT_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
@@ -35,7 +35,7 @@ add_executable (
 	"src/main.cpp"  
 	${SERVER_FILES}
 	${ARCFACE_FILES}
-	${CONFIG_FILES}
+	${CONFIG_FILES} 
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})

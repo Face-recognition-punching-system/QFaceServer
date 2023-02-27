@@ -39,8 +39,7 @@ std::string utils::body(std::string&& message) {
 /// </summary>
 /// <param name="utf8"></param>
 /// <returns></returns>
-std::string utils::U2G(const std::string utf8)
-{
+std::string utils::U2G(const std::string utf8) {
 	double len = static_cast<double>(MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0));
 	wchar_t* wstr = new wchar_t[len + 1];
 	memset(wstr, 0, len + 1);
@@ -58,8 +57,7 @@ std::string utils::U2G(const std::string utf8)
 /// </summary>
 /// <param name="gb2312"></param>
 /// <returns></returns>
-std::string utils::G2U(const std::string gb2312)
-{
+std::string utils::G2U(const std::string gb2312) {
 	double len = static_cast<double>(MultiByteToWideChar(CP_ACP, 0, gb2312.c_str(), -1, NULL, 0));
 	wchar_t* wstr = new wchar_t[len + 1];
 	memset(wstr, 0, len + 1);
@@ -105,9 +103,9 @@ static std::string utils::base64Decode(const char* Data, int DataByte) {
 					strDecode += nValue & 0x000000FF;
 				}
 			}
+
 			i += 4;
-		}
-		else {
+		} else {
 			Data++;
 			i++;
 		}
@@ -138,8 +136,7 @@ std::string utils::base64Encode(const unsigned char* Data, int DataByte) {
 		strEncode += EncodeTable[(Tmp[1] & 0xFC) >> 2];
 		strEncode += EncodeTable[((Tmp[1] & 0x03) << 4)];
 		strEncode += "==";
-	}
-	else if (Mod == 2) {
+	} else if (Mod == 2) {
 		Tmp[1] = *Data++;
 		Tmp[2] = *Data++;
 		strEncode += EncodeTable[(Tmp[1] & 0xFC) >> 2];

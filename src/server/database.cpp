@@ -1,11 +1,11 @@
+#include <Poco/JSON/Parser.h>
+#include <mutex>
+#include <memory>
+
 #include "database.h"
 #include "logger.h"
 #include "utils.h"
 #include "../config/config.h"
-
-// 饿汉模式
-// Database* Database::_instance = new Database();
-
 
 Database::Database() {
 	_connection = mysql_init(nullptr);

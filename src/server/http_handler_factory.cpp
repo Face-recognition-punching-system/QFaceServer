@@ -1,7 +1,7 @@
 #include "http_handler_factory.h"
 #include "admin_http_handler.h"
-#include "user_http_handler.h"
 #include "video_http_handler.h"
+#include "worker_http_handler.h"
 #include "intercept_http_handler.h"
 
 Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
@@ -11,11 +11,7 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
 	const std::string contentType = req.getContentType();
 	const std::string host = req.getHost();
 	std::cout << host << std::endl;
-	if (uri == "/user/signIn" && method == "POST" && contentType == "application/json") {
-		return new UserSignInRequestHandler;
-	} else if (uri == "/user/reco" && method == "POST" && contentType == "application/json") {
-		return new UserRecoRequestHandler;
-	} else if (uri == "/admin/signIn" && method == "POST" && contentType == "application/json") {
+	if (uri == "/admin/signIn" && method == "POST" && contentType == "application/json") {
 		return new AdminSignInRequestHandler;
 	} else if (uri == "/admin/updatePassword" && method == "POST" && contentType == "application/json") {
 		return new AdminUpdatePasswordRequestHandler;
@@ -39,6 +35,14 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
 		return new AdminUpdateWorkerImgRequestHandler;
 	} else if (uri == "/video/reco" && method == "POST" && contentType == "application/json") {
 		return new VideoRecoHandler;
+	} else if (uri == "/worker/signIn" && method == "POST" && contentType == "application/json") {
+		return new WorkerSignInRequestHandler;
+	} else if (uri == "/worker/getClock" && method == "POST" && contentType == "application/json") {
+		return new WorkerGetClockHandler;
+	} else if (uri == "/worker/getClock" && method == "POST" && contentType == "application/json") {
+		return new WorkerGetClockHandler;
+	} else if (uri == "/worker/getFeedback" && method == "POST" && contentType == "application/json") {
+		return new WorkerCreateFeedbackHandler;
 	} else {
 		return new InterceptHttpHandler;
 	}

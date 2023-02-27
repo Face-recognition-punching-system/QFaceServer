@@ -1,3 +1,10 @@
+#include <Poco/JSON/Parser.h>
+#include <format>
+#include <io.h>
+#include <direct.h>
+#include <mutex>
+#include <opencv2/opencv.hpp>
+
 #include "admin_http_handler.h"
 #include "database_pool.h"
 #include "redis_pool.h"

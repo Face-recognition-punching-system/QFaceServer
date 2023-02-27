@@ -1,10 +1,7 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <Poco/JSON/Parser.h>
 #include <mysql.h>
-#include <mutex>
-#include <memory>
 
 class Database {
 private:
@@ -23,6 +20,7 @@ public:
 	inline clock_t getAliveTime() const {
 		return clock() - _alivetime;
 	}
+
 	inline void refreshAliveTime() {
 		_alivetime = clock();
 	}
