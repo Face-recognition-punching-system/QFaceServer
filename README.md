@@ -2,25 +2,25 @@
     人脸识别考勤系统服务端
 </h1>
 
-## 如何开始
+## 🚀 如何开始
 
 > **Note**
 >
 > 为了使用 format 格式化 SQL 语句，C++ 版本设置为 20
 
-## 环境
+## 🚀 环境
 
 - Visual Studio 2019
 - Windows 10
 - Cmake 3.25.2
 
-## 拉取代码
+## 🚀 拉取代码
 
 ```bash
 git clone https://github.com/Face-recognition-punching-system/QFaceServer.git
 ```
 
-## 目录树
+## 🚀 目录树
 
 ```text
 .
