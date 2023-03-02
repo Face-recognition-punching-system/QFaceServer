@@ -21,6 +21,7 @@ git clone https://github.com/Face-recognition-punching-system/QFaceServer.git
 ## 目录树
 
 ```text
+.
 └───src
     │   main.cpp
     │
@@ -109,7 +110,7 @@ cd poco
 mkdir cmake-build
 cd cmake-build
 cmake ..
-cmake --build . --config Release
+cmake --build . --config Release --target install
 ```
 
 ### hiredis
@@ -120,7 +121,7 @@ cd hiredis
 mkdir build
 cd build
 cmake ..
-cmake --build . --config Release
+cmake --build . --config Release --target install
 ```
 
 ### redis-plus-plus
@@ -131,5 +132,5 @@ cd redis-plus-plus
 mkdir build
 cd build
 cmake ..
-cmake --build . --config Release
+cmake --build . --config Release --target install
 ```
