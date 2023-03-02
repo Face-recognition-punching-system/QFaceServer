@@ -18,6 +18,69 @@
 git clone https://github.com/Face-recognition-punching-system/QFaceServer.git
 ```
 
+## 目录树
+
+```text
+└───src
+    │   main.cpp
+    │
+    ├───arcface
+    │       detector.cpp
+    │       detector.h
+    │       detector_handler.cpp
+    │       detector_handler.h
+    │       face.h
+    │       Facenet.cpp
+    │       Facenet.h
+    │       facenet_handler.cpp
+    │       facenet_handler.h
+    │       onet.cpp
+    │       onet.h
+    │       pnet.cpp
+    │       pnet.h
+    │       rnet.cpp
+    │       rnet.h
+    │       utils.h
+    │
+    ├───config
+    │       config.h
+    │    
+    ├───model
+    │       det1.caffemodel
+    │       det1.prototxt
+    │       det2.caffemodel
+    │       det2.prototxt
+    │       det3.caffemodel
+    │       det3.prototxt
+    │       facenet.pb
+    │       facenet.pbtxt
+    │
+    ├───server
+    │       admin_http_handler.cpp
+    │       admin_http_handler.h
+    │       database.cpp
+    │       database.h
+    │       database_pool.cpp
+    │       database_pool.h
+    │       http_handler_factory.cpp
+    │       http_handler_factory.h
+    │       http_server.cpp
+    │       http_server.h
+    │       intercept_http_handler.cpp
+    │       intercept_http_handler.h
+    │       logger.cpp
+    │       logger.h
+    │       redis_pool.cpp
+    │       redis_pool.h
+    │       utils.cpp
+    │       utils.h
+    │       video_http_handler.cpp
+    │       video_http_handler.h
+    │       worker_http_handler.cpp
+    │       worker_http_handler.h
+    │
+```
+
 ## 依赖安装
 
 ### OpenCV
