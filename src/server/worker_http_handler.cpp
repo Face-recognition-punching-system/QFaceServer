@@ -17,14 +17,14 @@ void WorkerSignInRequestHandler::handleRequest(
 	try {
 		Poco::JSON::Parser parser;
 		auto object = parser.parse(data).extract<Poco::JSON::Object::Ptr>();
-		if (object->has("adminId") && object->has("password") && object->size() == 2) {
+		if (object->has("workerId") && object->has("password") && object->size() == 2) {
 			DatabasePool* dbp = DatabasePool::getInstance();
 			std::shared_ptr<Database> db = dbp->getDatabase();
-			std::string&& adminId = object->get("adminId");
+			std::string&& workerId = object->get("workerId");
 			std::string&& password = object->get("password");
 			std::string query = std::format(
 				"select id, workerId, name, age, department from qface.worker where workerId = \"{}\" and password = \"{}\"",
-				adminId, password);
+				workerId, password);
 			body = db->readOne(query, { "id", "workerId", "name", "age", "department"});
 			auto ret = parser.parse(body).extract<Poco::JSON::Object::Ptr>();
 			if (ret->has("id")) {

@@ -9,8 +9,7 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
 	const std::string method = req.getMethod().c_str();
 	const std::string uri = req.getURI().c_str();
 	const std::string contentType = req.getContentType();
-	const std::string host = req.getHost();
-	std::cout << host << std::endl;
+	std::cout << method << " " << uri << " " << contentType << std::endl;
 	if (uri == "/admin/signIn" && method == "POST" && contentType == "application/json") {
 		return new AdminSignInRequestHandler;
 	} else if (uri == "/admin/updatePassword" && method == "POST" && contentType == "application/json") {
@@ -35,13 +34,13 @@ Poco::Net::HTTPRequestHandler* HTTPHandlerFactory::createRequestHandler(
 		return new AdminUpdateWorkerImgRequestHandler;
 	} else if (uri == "/video/reco" && method == "POST" && contentType == "application/json") {
 		return new VideoRecoHandler;
-	} else if (uri == "/worker/signIn" && method == "POST" && contentType == "application/json") {
+	} else if (uri == "/worker/signIn" && method == "POST" && contentType == "application/json;charset=UTF-8") {
 		return new WorkerSignInRequestHandler;
-	} else if (uri == "/worker/getClock" && method == "POST" && contentType == "application/json") {
+	} else if (uri == "/worker/getClock" && method == "POST" && contentType == "application/json;charset=UTF-8") {
 		return new WorkerGetClockHandler;
-	} else if (uri == "/worker/getClock" && method == "POST" && contentType == "application/json") {
-		return new WorkerGetClockHandler;
-	} else if (uri == "/worker/getFeedback" && method == "POST" && contentType == "application/json") {
+	} else if (uri == "/worker/getFeedback" && method == "POST" && contentType == "application/json;charset=UTF-8") {
+		return new WorkerGetFeedbackHandler;
+	} else if (uri == "/worker/addFeedback" && method == "POST" && contentType == "application/json;charset=UTF-8") {
 		return new WorkerCreateFeedbackHandler;
 	} else {
 		return new InterceptHttpHandler;
