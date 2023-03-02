@@ -19,7 +19,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB ARCFACE_FILES "src/arcface/*")
 file(GLOB CONFIG_FILES "src/config/*")
-file(GLOB SERVER_FILES "src/server/*") 
+file(GLOB SERVER_FILES "src/server/*")
 
 configure_file("src/model/det1.caffemodel" "model/det1.caffemodel" COPYONLY)
 configure_file("src/model/det1.prototxt" "model/det1.prototxt" COPYONLY)

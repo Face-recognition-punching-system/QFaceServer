@@ -2,25 +2,32 @@
     人脸识别考勤系统服务端
 </h1>
 
-## 🚀 如何开始
+## 🚀 快速开始
 
 > **Note**
 >
 > 为了使用 format 格式化 SQL 语句，C++ 版本设置为 20
 
-## 🚀 环境
+### 环境
 
 - Visual Studio 2019
 - Windows 10
-- Cmake 3.25.2
+- Cmake 3.20.21032501-MSVC_2
+- Ninja 1.10.2
+- MySQL 5.7.40
+- Redis 7.0.5
 
-## 🚀 拉取代码
+### 拉取代码
 
 ```bash
 git clone https://github.com/Face-recognition-punching-system/QFaceServer.git
 ```
 
-## 🚀 目录树
+### 构建
+
+通过 Visual Studio 构建
+
+## 🌲 目录树
 
 ```text
 .
@@ -112,6 +119,7 @@ cd poco
 mkdir cmake-build
 cd cmake-build
 cmake ..
+cmake --build . --config Release -j 2
 cmake --build . --config Release --target install
 ```
 
@@ -123,6 +131,7 @@ cd hiredis
 mkdir build
 cd build
 cmake ..
+cmake --build . --config Release -j 2
 cmake --build . --config Release --target install
 ```
 
@@ -134,5 +143,6 @@ cd redis-plus-plus
 mkdir build
 cd build
 cmake ..
+cmake --build . --config Release -j 2
 cmake --build . --config Release --target install
 ```
