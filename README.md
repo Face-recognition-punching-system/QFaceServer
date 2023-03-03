@@ -104,8 +104,8 @@ cd 4.5.5
 mkdir build
 cd build
 cmake \
-  -D CMAKE_BUILD_TYPE=Release \
-  -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.5.5/modules \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.5.5/modules \
   ..
 cmake --build . --config Release -j 2
 cmake --build . --config Release --target install
