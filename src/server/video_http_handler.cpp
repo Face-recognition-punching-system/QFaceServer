@@ -47,6 +47,11 @@ void VideoRecoHandler::handleRequest(Poco::Net::HTTPServerRequest& req, Poco::Ne
 							auto ret = parser.parse(body).extract<Poco::JSON::Object::Ptr>();
 							if (!ret->has("name") || !ret->has("workerId")) {
 								body = utils::body("fail");
+								query = std::format("update clock set isClock = '是', img = {} to_days(时间字段名) = to_days(now())", base64);
+								std::string result = db->update(query);
+								if (result != "{\"message\":\"success\"}") {
+									body = utils::body("fail");
+								}
 							}
 						} else {
 							body = utils::body("fail");
