@@ -112,8 +112,7 @@ std::string Database::read(std::string& query, std::initializer_list<std::string
 				Poco::JSON::Object object;
 				int i = 0;
 				for (auto& r : rest) {
-					//object.set(r, std::format("{}", line[i] == NULL ? "" : line[i]));
-					object.set(r, std::format("{}", line[i]));
+					object.set(r, std::format("{}", line[i] == NULL ? "" : line[i]));
 					i++;
 				}
 
